@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DSV Gate System</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --dsv-navy: #0a1628;
+  --dsv-blue: #1a3a6b;
+  --dsv-accent: #f4a72a;
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --pending-bg: #fef3c7;
+  --pending-text: #92400e;
+  --verified-bg: #d1fae5;
+  --verified-text: #065f46;
+  --input-bg: #f9fafb;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1117; --card: #1a1f2e; --text: #f1f5f9;
+    --text-muted: #94a3b8; --border: #2d3748; --input-bg: #252d3d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1117; --card: #1a1f2e; --text: #f1f5f9;
+  --text-muted: #94a3b8; --border: #2d3748; --input-bg: #252d3d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, var(--dsv-navy) 0%, var(--dsv-blue) 100%);
+  padding: 20px 20px 28px;
+  color: white;
+}
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.dsv-logo { background: var(--dsv-accent); color: var(--dsv-navy); font-weight: 700; font-size: 18px; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; }
+.header-title { font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
+.header-heading { font-size: 26px; font-weight: 700; line-height: 1.2; }
+.header-sub { font-size: 14px; opacity: 0.7; margin-top: 6px; }
+.mode-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; color: white; font-family: inherit; }
+
+/* Layout */
+.main { padding: 20px 16px 40px; max-width: 560px; margin: 0 auto; }
+.card { background: var(--card); border-radius: 16px; padding: 24px 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
+
+/* Form */
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+.field input, .field select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; font-family: inherit; background: var(--input-bg); color: var(--text); -webkit-appearance: none; transition: border-color 0.2s; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--dsv-blue); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Buttons */
+.btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--dsv-blue); color: white; }
+.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+.btn-sm { width: auto; padding: 7px 16px; font-size: 13px; border-radius: 8px; }
+.btn-verify { background: var(--dsv-blue); color: white; }
+
+/* Success */
+.success-screen { text-align: center; padding: 24px 0; }
+.success-icon { font-size: 60px; margin-bottom: 14px; }
+.success-title { font-size: 24px; font-weight: 700; color: #10b981; margin-bottom: 8px; }
+.success-sub { color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+.success-ref { background: var(--bg); border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; }
+.success-ref-main { font-size: 18px; font-weight: 700; }
+.success-ref-time { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+/* PIN */
+.pin-screen { text-align: center; padding: 8px 0; }
+.pin-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.pin-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 28px; }
+.pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 32px; }
+.pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); background: transparent; transition: background 0.15s, border-color 0.15s; }
+.pin-dot.filled { background: var(--dsv-blue); border-color: var(--dsv-blue); }
+.pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 280px; margin: 0 auto; }
+.pin-key { padding: 18px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 20px; font-weight: 600; background: var(--card); color: var(--text); cursor: pointer; font-family: inherit; }
+.pin-key:active { background: var(--bg); }
+.pin-error { color: #ef4444; font-size: 13px; margin-top: 14px; min-height: 20px; }
+
+/* Operator toolbar */
+.ops-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.ops-count { font-size: 13px; color: var(--text-muted); }
+.filter-tabs { display: flex; gap: 6px; }
+.filter-tab { padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 12px; font-weight: 600; cursor: pointer; background: transparent; color: var(--text-muted); font-family: inherit; transition: all 0.15s; }
+.filter-tab.active { background: var(--dsv-blue); border-color: var(--dsv-blue); color: white; }
+
+/* Entry cards */
+.entry-card { background: var(--card); border-radius: 14px; margin-bottom: 12px; box-shadow: var(--shadow); overflow: hidden; border: 1.5px solid var(--border); }
+.entry-header { padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+.entry-main { flex: 1; min-width: 0; }
+.entry-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+.entry-plate { font-weight: 700; font-size: 15px; }
+.entry-do { font-size: 13px; color: var(--text-muted); }
+.entry-meta { font-size: 12px; color: var(--text-muted); }
+.status-badge { flex-shrink: 0; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+.status-pending { background: var(--pending-bg); color: var(--pending-text); }
+.status-verified { background: var(--verified-bg); color: var(--verified-text); }
+.entry-body { padding: 0 16px 16px; border-top: 1px solid var(--border); }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 0; }
+.detail-item label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); display: block; margin-bottom: 2px; }
+.detail-item span { font-size: 14px; font-weight: 500; }
+.entry-actions { display: flex; gap: 8px; margin-top: 4px; align-items: center; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
+.modal-sheet { background: var(--card); border-radius: 20px 20px 0 0; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; padding: 20px 20px 48px; }
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+.modal-title { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+
+/* Misc */
+.loading { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--dsv-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 0 16px 20px; }
+.err-msg { color: #ef4444; font-size: 13px; text-align: center; margin-top: 10px; min-height: 20px; }
+.ops-exit { font-size: 12px; color: rgba(255,255,255,0.6); cursor: pointer; text-decoration: underline; }
+.divider-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin: 20px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+/* Setup view */
+.setup-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--bg); }
+.setup-card { background: var(--card); border-radius: 20px; padding: 36px 28px; max-width: 480px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+.setup-logo { background: var(--dsv-accent); color: var(--dsv-navy); font-weight: 700; font-size: 20px; padding: 5px 12px; border-radius: 4px; letter-spacing: 1px; display: inline-block; margin-bottom: 20px; }
+.setup-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.setup-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+.setup-label { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 6px; }
+.setup-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-family: monospace; background: var(--input-bg); color: var(--text); box-sizing: border-box; }
+.setup-input:focus { outline: 2px solid var(--dsv-accent); border-color: transparent; }
+.setup-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; margin-bottom: 24px; }
+.setup-btn { width: 100%; padding: 14px; background: var(--dsv-accent); color: var(--dsv-navy); font-weight: 700; font-size: 15px; border: none; border-radius: 12px; cursor: pointer; font-family: inherit; }
+.setup-btn:active { opacity: 0.85; }
+.setup-err { color: #ef4444; font-size: 13px; margin-top: 12px; min-height: 18px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ SETUP VIEW ═══════════════════ -->
+<div id="view-setup">
+  <div class="setup-wrap">
+    <div class="setup-card">
+      <div class="setup-logo">DSV</div>
+      <div class="setup-title">First-Time Setup</div>
+      <div class="setup-sub">Paste your GitHub token below. It will be saved to this device only — it is never uploaded anywhere.</div>
+      <div class="setup-label">GitHub Personal Access Token</div>
+      <input type="password" class="setup-input" id="setup-token" placeholder="github_pat_…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <div class="setup-hint">Go to GitHub → Settings → Developer Settings → Personal Access Tokens → Fine-grained tokens, then copy the token and paste here.</div>
+      <button class="setup-btn" onclick="saveSetup()">Save &amp; Continue</button>
+      <div class="setup-err" id="setup-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ DRIVER VIEW ═══════════════════ -->
+<div id="view-driver">
+  <div class="header">
+    <div class="header-top">
+      <div><span class="dsv-logo">DSV</span></div>
+      <div style="text-align:right">
+        <div class="header-title">Warehouse Gate Entry</div>
+        <button class="mode-btn" onclick="showPinEntry()" style="margin-top:6px">Operator ›</button>
+      </div>
+    </div>
+    <div class="header-heading">Before You Enter</div>
+    <div class="header-sub">Fill in all required fields and submit before entering the warehouse.</div>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <div class="section-label">Shipment Details</div>
+      <div class="field">
+        <label>Delivery Order No. *</label>
+        <input type="text" id="d-do" placeholder="e.g. DO-2026-001" autocomplete="off" autocapitalize="characters">
+      </div>
+      <div class="field">
+        <label>AWB / Tracking No.</label>
+        <input type="text" id="d-awb" placeholder="e.g. 123-45678901" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Forwarder *</label>
+        <input type="text" id="d-forwarder" placeholder="e.g. DHL, FedEx, Schenker" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Driver & Vehicle</div>
+      <div class="field">
+        <label>Driver Name *</label>
+        <input type="text" id="d-name" placeholder="Full name" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Truck Plate No. *</label>
+        <input type="text" id="d-plate" placeholder="e.g. GBE1234T" autocomplete="off" autocapitalize="characters">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Cargo Quantity</div>
+      <div class="field-row">
+        <div class="field"><label>Pallets</label><input type="number" id="d-pallets" placeholder="0" min="0"></div>
+        <div class="field"><label>Cartons</label><input type="number" id="d-cartons" placeholder="0" min="0"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Metro Car</label><input type="number" id="d-metro" placeholder="0" min="0"></div>
+        <div class="field"><label>Crates</label><input type="number" id="d-crates" placeholder="0" min="0"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>ADO / SKID</label><input type="number" id="d-ado" placeholder="0" min="0"></div>
+        <div class="field"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="submit-btn" onclick="submitDriver()">Submit Check-In</button>
+    <div class="err-msg" id="submit-error"></div>
+  </div>
+  <div class="footer">DSV Singapore · Warehouse Gate System</div>
+</div>
+
+<!-- ═══════════════════ SUCCESS VIEW ═══════════════════ -->
+<div id="view-success" hidden>
+  <div class="header">
+    <div class="header-top">
+      <span class="dsv-logo">DSV</span>
+      <div class="header-title">Warehouse Gate Entry</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="card">
+      <div class="success-screen">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Submitted Successfully</div>
+        <div class="success-sub">Your entry has been recorded.<br>You may now proceed into the warehouse.</div>
+        <div class="success-ref">
+          <div class="success-ref-main" id="success-ref-text"></div>
+          <div class="success-ref-time" id="success-ref-time"></div>
+        </div>
+        <button class="btn btn-outline" onclick="resetDriver()">Submit Another Entry</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer">DSV Singapore · Warehouse Gate System</div>
+</div>
+
+<!-- ═══════════════════ PIN VIEW ═══════════════════ -->
+<div id="view-pin" hidden>
+  <div class="header">
+    <div class="header-top">
+      <span class="dsv-logo">DSV</span>
+      <button class="mode-btn" onclick="showDriver()">← Back</button>
+    </div>
+    <div class="header-heading">Operator Access</div>
+  </div>
+  <div class="main">
+    <div class="card">
+      <div class="pin-screen">
+        <div class="pin-title">Enter PIN</div>
+        <div class="pin-sub">4-digit operator PIN required</div>
+        <div class="pin-dots">
+          <div class="pin-dot" id="pd0"></div>
+          <div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div>
+          <div class="pin-dot" id="pd3"></div>
+        </div>
+        <div class="pin-pad">
+          <button class="pin-key" onclick="pinKey('1')">1</button>
+          <button class="pin-key" onclick="pinKey('2')">2</button>
+          <button class="pin-key" onclick="pinKey('3')">3</button>
+          <button class="pin-key" onclick="pinKey('4')">4</button>
+          <button class="pin-key" onclick="pinKey('5')">5</button>
+          <button class="pin-key" onclick="pinKey('6')">6</button>
+          <button class="pin-key" onclick="pinKey('7')">7</button>
+          <button class="pin-key" onclick="pinKey('8')">8</button>
+          <button class="pin-key" onclick="pinKey('9')">9</button>
+          <button class="pin-key" onclick="pinKey('clear')" style="font-size:13px">CLR</button>
+          <button class="pin-key" onclick="pinKey('0')">0</button>
+          <button class="pin-key" onclick="pinKey('back')">⌫</button>
+        </div>
+        <div class="pin-error" id="pin-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ OPERATOR VIEW ═══════════════════ -->
+<div id="view-operator" hidden>
+  <div class="header">
+    <div class="header-top">
+      <span class="dsv-logo">DSV</span>
+      <div style="text-align:right">
+        <div class="header-title" style="margin-bottom:4px">Operator Console</div>
+        <span class="ops-exit" onclick="showDriver()">Exit ×</span>
+      </div>
+    </div>
+    <div class="header-heading">Inbound Shipments</div>
+    <div class="header-sub" id="ops-last-update">Loading…</div>
+  </div>
+
+  <div class="main">
+    <div class="ops-toolbar">
+      <span class="ops-count" id="ops-count"></span>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-tab" onclick="setFilter('Pending',this)">Pending</button>
+        <button class="filter-tab" onclick="setFilter('Verified',this)">Verified</button>
+      </div>
+    </div>
+    <div id="ops-list"></div>
+    <button class="btn btn-outline" style="margin-top:8px;font-size:13px;padding:11px" onclick="loadOperatorData()">↻ Refresh</button>
+  </div>
+  <div class="footer">DSV Singapore · Warehouse Gate System</div>
+</div>
+
+<!-- ═══════════════════ VERIFY MODAL ═══════════════════ -->
+<div id="modal-verify" hidden>
+  <div class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Verify Entry</div>
+      <div class="modal-sub" id="modal-sub"></div>
+      <input type="hidden" id="v-entry-id">
+
+      <div class="section-label">Operator</div>
+      <div class="field">
+        <label>Operator Name *</label>
+        <input type="text" id="v-op-name" placeholder="Your name">
+      </div>
+
+      <div class="divider-label">Corrections (leave blank if same as driver)</div>
+      <div class="field">
+        <label>Final Truck Plate</label>
+        <input type="text" id="v-plate" placeholder="—" autocapitalize="characters">
+      </div>
+      <div class="field">
+        <label>Final DO No.</label>
+        <input type="text" id="v-do" placeholder="—" autocapitalize="characters">
+      </div>
+      <div class="field">
+        <label>Final ADO / SKID</label>
+        <input type="number" id="v-ado" placeholder="—" min="0">
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Final Pallets</label><input type="number" id="v-pallets" placeholder="—" min="0"></div>
+        <div class="field"><label>Final Cartons</label><input type="number" id="v-cartons" placeholder="—" min="0"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Final MC</label><input type="number" id="v-metro" placeholder="—" min="0"></div>
+        <div class="field"><label>Final Crates</label><input type="number" id="v-crates" placeholder="—" min="0"></div>
+      </div>
+      <div class="field">
+        <label>Remarks</label>
+        <input type="text" id="v-remarks" placeholder="Optional notes">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal()" style="flex:1;padding:13px">Cancel</button>
+        <button class="btn btn-verify" id="verify-save-btn" onclick="saveVerification()" style="flex:2">Save Verification</button>
+      </div>
+      <div class="err-msg" id="verify-error"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG — token loaded from localStorage, never hardcoded ─────────────────
+const CONFIG = {
+  GITHUB_TOKEN: '',   // populated at runtime from localStorage
+  GITHUB_OWNER: 'clbizsupport',
+  GITHUB_REPO:  'Warehouse-Entry-Form',
+  GITHUB_FILE:  'data.json',
+  OPERATOR_PIN: '6767',
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let pinBuffer   = '';
+let allEntries  = [];
+let curFilter   = 'all';
+let expandedIds = new Set();
+
+// ─── VIEW HELPERS ─────────────────────────────────────────────────────────────
+const VIEWS = ['view-setup','view-driver','view-success','view-pin','view-operator'];
+function showView(id) { VIEWS.forEach(v => { document.getElementById(v).hidden = v !== id; }); }
+function showDriver()   { showView('view-driver'); }
+function showPinEntry() {
+  pinBuffer = ''; updateDots();
+  document.getElementById('pin-error').textContent = '';
+  showView('view-pin');
+}
+function resetDriver() {
+  ['d-do','d-awb','d-forwarder','d-name','d-plate','d-ado','d-pallets','d-cartons','d-metro','d-crates']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('submit-error').textContent = '';
+  showView('view-driver');
+}
+
+// ─── TIME HELPERS ─────────────────────────────────────────────────────────────
+function nowSGT() {
+  return new Date().toLocaleString('en-SG', {
+    timeZone: 'Asia/Singapore',
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+  });
+}
+
+// ─── PIN ──────────────────────────────────────────────────────────────────────
+function pinKey(k) {
+  if (k === 'clear')      pinBuffer = '';
+  else if (k === 'back')  pinBuffer = pinBuffer.slice(0,-1);
+  else if (pinBuffer.length < 4) pinBuffer += k;
+  updateDots();
+  if (pinBuffer.length === 4) checkPin();
+}
+function updateDots() {
+  for (let i = 0; i < 4; i++)
+    document.getElementById('pd'+i).classList.toggle('filled', i < pinBuffer.length);
+}
+function checkPin() {
+  if (pinBuffer === CONFIG.OPERATOR_PIN) {
+    showView('view-operator');
+    loadOperatorData();
+  } else {
+    document.getElementById('pin-error').textContent = 'Incorrect PIN. Try again.';
+    setTimeout(() => { pinBuffer = ''; updateDots(); }, 900);
+  }
+}
+
+// ─── GITHUB API ───────────────────────────────────────────────────────────────
+const API = `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/contents/${CONFIG.GITHUB_FILE}`;
+const HDR = {
+  'Authorization': `token ${CONFIG.GITHUB_TOKEN}`,
+  'Accept': 'application/vnd.github.v3+json',
+  'Content-Type': 'application/json'
+};
+
+async function ghRead() {
+  const r = await fetch(API, { headers: HDR });
+  if (r.status === 404) return { entries: [], sha: null };
+  if (!r.ok) throw new Error(`GitHub read failed (${r.status})`);
+  const j = await r.json();
+  return { entries: JSON.parse(atob(j.content.replace(/\n/g,''))), sha: j.sha };
+}
+
+async function ghWrite(entries, sha) {
+  const body = {
+    message: `gate: update data.json ${new Date().toISOString()}`,
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(entries, null, 2))))
+  };
+  if (sha) body.sha = sha;
+  const r = await fetch(API, { method: 'PUT', headers: HDR, body: JSON.stringify(body) });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message || `GitHub write failed (${r.status})`); }
+}
+
+// ─── DRIVER SUBMIT ────────────────────────────────────────────────────────────
+async function submitDriver() {
+  const g = id => document.getElementById(id).value.trim();
+  const doNum   = g('d-do');
+  const name    = g('d-name');
+  const plate   = g('d-plate').toUpperCase();
+  const fwd     = g('d-forwarder');
+  const awb     = g('d-awb');
+  const ado     = parseInt(document.getElementById('d-ado').value) || 0;
+  const pallets = parseInt(document.getElementById('d-pallets').value) || 0;
+  const cartons = parseInt(document.getElementById('d-cartons').value) || 0;
+  const metro   = parseInt(document.getElementById('d-metro').value)   || 0;
+  const crates  = parseInt(document.getElementById('d-crates').value)  || 0;
+
+  const errEl = document.getElementById('submit-error');
+  errEl.textContent = '';
+
+  if (!doNum)  { errEl.textContent = 'Delivery Order No. is required.'; return; }
+  if (!name)   { errEl.textContent = 'Driver Name is required.'; return; }
+  if (!plate)  { errEl.textContent = 'Truck Plate is required.'; return; }
+  if (!fwd)    { errEl.textContent = 'Forwarder is required.'; return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Submitting…'; btn.disabled = true;
+
+  try {
+    const entry = {
+      id: `DSV-${Date.now()}`,
+      delivery_order: doNum,
+      awb, driver_name: name, truck_plate: plate,
+      forwarder: fwd, ado_skid: ado,
+      pallets, cartons, metro_car: metro, crates,
+      submitted_at: new Date().toISOString(),
+      submitted_at_sgt: nowSGT(),
+      status: 'Pending',
+      operator_name: '', verified_time: '',
+      final_truck_plate: '', final_do: '', final_ado_skid: '',
+      final_pallets: null, final_cartons: null, final_mc: null, final_crates: null,
+      remarks: ''
+    };
+    const { entries, sha } = await ghRead();
+    entries.push(entry);
+    await ghWrite(entries, sha);
+
+    document.getElementById('success-ref-text').textContent = `${plate} · ${doNum}`;
+    document.getElementById('success-ref-time').textContent = `Submitted at ${entry.submitted_at_sgt}`;
+    showView('view-success');
+  } catch(e) {
+    errEl.textContent = 'Submission failed: ' + e.message;
+  } finally {
+    btn.textContent = 'Submit Check-In'; btn.disabled = false;
+  }
+}
+
+// ─── OPERATOR LIST ────────────────────────────────────────────────────────────
+async function loadOperatorData() {
+  const listEl = document.getElementById('ops-list');
+  listEl.innerHTML = '<div class="loading"><div class="spinner"></div>Loading entries…</div>';
+  try {
+    const { entries } = await ghRead();
+    allEntries = [...entries].reverse();
+    document.getElementById('ops-last-update').textContent = `Updated: ${nowSGT()}`;
+    renderList();
+  } catch(e) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Load failed</div><div>${e.message}</div></div>`;
+  }
+}
+
+function setFilter(f, el) {
+  curFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+function renderList() {
+  const filtered = curFilter === 'all' ? allEntries : allEntries.filter(e => e.status === curFilter);
+  const pending  = allEntries.filter(e => e.status === 'Pending').length;
+  document.getElementById('ops-count').textContent = `${pending} pending · ${allEntries.length} total`;
+  const listEl = document.getElementById('ops-list');
+
+  if (!filtered.length) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No entries</div><div>No ${curFilter==='all'?'':curFilter.toLowerCase()+' '}submissions found.</div></div>`;
+    return;
+  }
+  listEl.innerHTML = filtered.map(entryHTML).join('');
+}
+
+function entryHTML(e) {
+  const exp = expandedIds.has(e.id);
+  const pend = e.status === 'Pending';
+  return `
+  <div class="entry-card">
+    <div class="entry-header" onclick="toggleEntry('${e.id}')">
+      <div class="entry-main">
+        <div class="entry-top">
+          <span class="entry-plate">${e.truck_plate}</span>
+          <span class="entry-do">${e.delivery_order}</span>
+        </div>
+        <div class="entry-meta">${e.driver_name} · ${e.submitted_at_sgt}</div>
+      </div>
+      <span class="status-badge ${pend?'status-pending':'status-verified'}">${e.status}</span>
+    </div>
+    ${exp ? `
+    <div class="entry-body">
+      <div class="detail-grid">
+        <div class="detail-item"><label>AWB</label><span>${e.awb||'—'}</span></div>
+        <div class="detail-item"><label>Forwarder</label><span>${e.forwarder||'—'}</span></div>
+        <div class="detail-item"><label>ADO/SKID</label><span>${e.ado_skid||'—'}</span></div>
+        <div class="detail-item"><label>Pallets</label><span>${e.pallets??'—'}</span></div>
+        <div class="detail-item"><label>Cartons</label><span>${e.cartons??'—'}</span></div>
+        <div class="detail-item"><label>Metro Car</label><span>${e.metro_car??'—'}</span></div>
+        <div class="detail-item"><label>Crates</label><span>${e.crates??'—'}</span></div>
+        ${!pend?`
+          <div class="detail-item"><label>Operator</label><span>${e.operator_name||'—'}</span></div>
+          <div class="detail-item"><label>Verified</label><span>${e.verified_time||'—'}</span></div>
+          ${e.remarks?`<div class="detail-item" style="grid-column:1/-1"><label>Remarks</label><span>${e.remarks}</span></div>`:''}
+        `:''}
+      </div>
+      <div class="entry-actions">
+        ${pend
+          ? `<button class="btn btn-sm btn-verify" onclick="openVerifyModal('${e.id}')">✓ Verify</button>`
+          : `<span style="font-size:12px;color:#10b981">✓ Verified by ${e.operator_name}</span>`
+        }
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+function toggleEntry(id) {
+  expandedIds.has(id) ? expandedIds.delete(id) : expandedIds.add(id);
+  renderList();
+}
+
+// ─── VERIFY MODAL ─────────────────────────────────────────────────────────────
+function openVerifyModal(id) {
+  const e = allEntries.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('v-entry-id').value = id;
+  document.getElementById('modal-sub').textContent = `${e.truck_plate} · ${e.delivery_order} · ${e.driver_name}`;
+  ['v-op-name','v-plate','v-do','v-ado','v-pallets','v-cartons','v-metro','v-crates','v-remarks']
+    .forEach(f => document.getElementById(f).value = '');
+  document.getElementById('verify-error').textContent = '';
+  document.getElementById('modal-verify').hidden = false;
+}
+
+function closeModal(evt) {
+  if (!evt || evt.target.classList.contains('modal-overlay'))
+    document.getElementById('modal-verify').hidden = true;
+}
+
+async function saveVerification() {
+  const id     = document.getElementById('v-entry-id').value;
+  const opName = document.getElementById('v-op-name').value.trim();
+  const errEl  = document.getElementById('verify-error');
+  errEl.textContent = '';
+  if (!opName) { errEl.textContent = 'Operator Name is required.'; return; }
+
+  const btn = document.getElementById('verify-save-btn');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+
+  try {
+    const { entries, sha } = await ghRead();
+    const idx = entries.findIndex(x => x.id === id);
+    if (idx < 0) throw new Error('Entry not found — it may have been deleted.');
+    const orig = entries[idx];
+
+    const numVal = (fid, fallback) => {
+      const v = document.getElementById(fid).value;
+      return v !== '' ? parseInt(v) : fallback;
+    };
+    const strVal = (fid, fallback) => {
+      const v = document.getElementById(fid).value.trim().toUpperCase();
+      return v || fallback;
+    };
+
+    entries[idx] = {
+      ...orig,
+      status:            'Verified',
+      operator_name:     opName,
+      verified_time:     nowSGT(),
+      final_truck_plate: strVal('v-plate', orig.truck_plate),
+      final_do:          strVal('v-do',    orig.delivery_order),
+      final_ado_skid:    numVal('v-ado',   orig.ado_skid),
+      final_pallets:     numVal('v-pallets', orig.pallets),
+      final_cartons:     numVal('v-cartons', orig.cartons),
+      final_mc:          numVal('v-metro',   orig.metro_car),
+      final_crates:      numVal('v-crates',  orig.crates),
+      remarks:           document.getElementById('v-remarks').value.trim(),
+    };
+
+    await ghWrite(entries, sha);
+
+    // update local state without full reload
+    allEntries = allEntries.map(x => x.id === id ? entries[idx] : x);
+    expandedIds.delete(id);
+    renderList();
+    document.getElementById('modal-verify').hidden = true;
+
+  } catch(e) {
+    errEl.textContent = 'Save failed: ' + e.message;
+  } finally {
+    btn.textContent = 'Save Verification'; btn.disabled = false;
+  }
+}
+
+// ─── SETUP / TOKEN MANAGEMENT ─────────────────────────────────────────────────
+const TOKEN_KEY = 'dsv_gh_token';
+
+function initApp() {
+  try {
+    const saved = localStorage.getItem(TOKEN_KEY);
+    if (saved && saved.trim()) {
+      CONFIG.GITHUB_TOKEN = saved.trim();
+      showDriver();
+    } else {
+      showView('view-setup');
+    }
+  } catch(e) {
+    showView('view-setup');
+  }
+}
+
+function saveSetup() {
+  const val = document.getElementById('setup-token').value.trim();
+  const errEl = document.getElementById('setup-err');
+  if (!val) { errEl.textContent = 'Please paste your GitHub token.'; return; }
+  if (!val.startsWith('github_pat_') && !val.startsWith('ghp_')) {
+    errEl.textContent = 'That does not look like a GitHub token (should start with github_pat_ or ghp_).';
+    return;
+  }
+  try {
+    localStorage.setItem(TOKEN_KEY, val);
+  } catch(e) {
+    errEl.textContent = 'Could not save to this browser. Try a different browser.';
+    return;
+  }
+  CONFIG.GITHUB_TOKEN = val;
+  errEl.textContent = '';
+  showDriver();
+}
+
+// Start
+initApp();
+</script>
+</body>
+</html>
