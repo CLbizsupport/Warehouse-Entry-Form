@@ -134,38 +134,9 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .err-msg { color: #ef4444; font-size: 13px; text-align: center; margin-top: 10px; min-height: 20px; }
 .ops-exit { font-size: 12px; color: rgba(255,255,255,0.6); cursor: pointer; text-decoration: underline; }
 .divider-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin: 20px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-/* Setup view */
-.setup-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--bg); }
-.setup-card { background: var(--card); border-radius: 20px; padding: 36px 28px; max-width: 480px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
-.setup-logo { background: var(--dsv-accent); color: var(--dsv-navy); font-weight: 700; font-size: 20px; padding: 5px 12px; border-radius: 4px; letter-spacing: 1px; display: inline-block; margin-bottom: 20px; }
-.setup-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-.setup-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
-.setup-label { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 6px; }
-.setup-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-family: monospace; background: var(--input-bg); color: var(--text); box-sizing: border-box; }
-.setup-input:focus { outline: 2px solid var(--dsv-accent); border-color: transparent; }
-.setup-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; margin-bottom: 24px; }
-.setup-btn { width: 100%; padding: 14px; background: var(--dsv-accent); color: var(--dsv-navy); font-weight: 700; font-size: 15px; border: none; border-radius: 12px; cursor: pointer; font-family: inherit; }
-.setup-btn:active { opacity: 0.85; }
-.setup-err { color: #ef4444; font-size: 13px; margin-top: 12px; min-height: 18px; }
 </style>
 </head>
 <body>
-
-<!-- ═══════════════════ SETUP VIEW ═══════════════════ -->
-<div id="view-setup">
-  <div class="setup-wrap">
-    <div class="setup-card">
-      <div class="setup-logo">DSV</div>
-      <div class="setup-title">First-Time Setup</div>
-      <div class="setup-sub">Paste your GitHub token below. It will be saved to this device only — it is never uploaded anywhere.</div>
-      <div class="setup-label">GitHub Personal Access Token</div>
-      <input type="password" class="setup-input" id="setup-token" placeholder="github_pat_…" autocomplete="off" autocorrect="off" spellcheck="false">
-      <div class="setup-hint">Go to GitHub → Settings → Developer Settings → Personal Access Tokens → Fine-grained tokens, then copy the token and paste here.</div>
-      <button class="setup-btn" onclick="saveSetup()">Save &amp; Continue</button>
-      <div class="setup-err" id="setup-err"></div>
-    </div>
-  </div>
-</div>
 
 <!-- ═══════════════════ DRIVER VIEW ═══════════════════ -->
 <div id="view-driver">
@@ -377,9 +348,9 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 </div>
 
 <script>
-// ─── CONFIG — token loaded from localStorage, never hardcoded ─────────────────
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
 const CONFIG = {
-  GITHUB_TOKEN: '',   // populated at runtime from localStorage
+  GITHUB_TOKEN: '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',
   GITHUB_OWNER: 'clbizsupport',
   GITHUB_REPO:  'Warehouse-Entry-Form',
   GITHUB_FILE:  'data.json',
@@ -393,7 +364,7 @@ let curFilter   = 'all';
 let expandedIds = new Set();
 
 // ─── VIEW HELPERS ─────────────────────────────────────────────────────────────
-const VIEWS = ['view-setup','view-driver','view-success','view-pin','view-operator'];
+const VIEWS = ['view-driver','view-success','view-pin','view-operator'];
 function showView(id) { VIEWS.forEach(v => { document.getElementById(v).hidden = v !== id; }); }
 function showDriver()   { showView('view-driver'); }
 function showPinEntry() {
@@ -671,44 +642,8 @@ async function saveVerification() {
   }
 }
 
-// ─── SETUP / TOKEN MANAGEMENT ─────────────────────────────────────────────────
-const TOKEN_KEY = 'dsv_gh_token';
-
-function initApp() {
-  try {
-    const saved = localStorage.getItem(TOKEN_KEY);
-    if (saved && saved.trim()) {
-      CONFIG.GITHUB_TOKEN = saved.trim();
-      showDriver();
-    } else {
-      showView('view-setup');
-    }
-  } catch(e) {
-    showView('view-setup');
-  }
-}
-
-function saveSetup() {
-  const val = document.getElementById('setup-token').value.trim();
-  const errEl = document.getElementById('setup-err');
-  if (!val) { errEl.textContent = 'Please paste your GitHub token.'; return; }
-  if (!val.startsWith('github_pat_') && !val.startsWith('ghp_')) {
-    errEl.textContent = 'That does not look like a GitHub token (should start with github_pat_ or ghp_).';
-    return;
-  }
-  try {
-    localStorage.setItem(TOKEN_KEY, val);
-  } catch(e) {
-    errEl.textContent = 'Could not save to this browser. Try a different browser.';
-    return;
-  }
-  CONFIG.GITHUB_TOKEN = val;
-  errEl.textContent = '';
-  showDriver();
-}
-
 // Start
-initApp();
+showDriver();
 </script>
 </body>
 </html>
