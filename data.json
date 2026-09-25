@@ -14,5 +14,31 @@
     "submitted_at_sgt": "25 Sep 2026, 11:00:00",
     "status": "Pending",
     "github_issue_num": 1
+  },
+  {
+    "id": "DSV-1790344967896",
+    "delivery_order": "1",
+    "awb": "1",
+    "driver_name": "1",
+    "truck_plate": "1",
+    "forwarder": "1",
+    "ado_skid": 0,
+    "pallets": 4,
+    "cartons": 0,
+    "metro_car": 0,
+    "crates": 0,
+    "submitted_at": "2026-09-25T14:02:47.896Z",
+    "submitted_at_sgt": "25 Sept 2026, 22:02:47",
+    "status": "Pending",
+    "operator_name": "",
+    "verified_time": "",
+    "final_truck_plate": "",
+    "final_do": "",
+    "final_ado_skid": "",
+    "final_pallets": null,
+    "final_cartons": null,
+    "final_mc": null,
+    "final_crates": null,
+    "remarks": ""
   }
 ]
