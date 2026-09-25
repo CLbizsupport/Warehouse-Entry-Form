@@ -1,0 +1,103 @@
+name: Update data.json
+
+on:
+  issues:
+    types: [opened, closed, labeled, edited]
+
+jobs:
+  build-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build data.json from issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Get all driver submissions (open issues)
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'driver-submission',
+              state: 'open',
+              per_page: 100
+            });
+
+            // Get all verified entries (closed driver-submission issues)
+            const { data: closedIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'driver-submission',
+              state: 'closed',
+              per_page: 100
+            });
+
+            // Get verify actions to merge status
+            const { data: verifyIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'operator-verify',
+              state: 'all',
+              per_page: 100
+            });
+
+            // Build verify map: submitted_at → verify payload
+            const verifyMap = {};
+            for (const vi of verifyIssues) {
+              try {
+                const v = JSON.parse(vi.body);
+                if (v.submitted_at) verifyMap[v.submitted_at] = v;
+              } catch {}
+            }
+
+            // Parse all submissions
+            const allIssues = [...openIssues, ...closedIssues];
+            const entries = [];
+            for (const issue of allIssues) {
+              try {
+                const entry = JSON.parse(issue.body);
+                entry.github_issue_num = issue.number;
+                // Check if there is a verify record for this entry
+                const verify = verifyMap[entry.submitted_at];
+                if (verify) {
+                  entry.status = 'Verified';
+                  entry.operator_name = verify.operator_name;
+                  entry.verified_at = verify.verified_at;
+                  // Apply corrections
+                  const c = verify.corrected_data || {};
+                  if (c.truck_plate)  entry.truck_plate  = c.truck_plate;
+                  if (c.shipment_ref) entry.shipment_ref = c.shipment_ref;
+                  if (c.pallets)      entry.pallets      = c.pallets;
+                  if (c.cartons)      entry.cartons      = c.cartons;
+                  if (c.metro_car)    entry.metro_car    = c.metro_car;
+                  if (c.crate)        entry.crate        = c.crate;
+                } else {
+                  entry.status = 'Pending';
+                }
+                entries.push(entry);
+              } catch (e) {
+                console.log('Skipping issue ' + issue.number + ': ' + e.message);
+              }
+            }
+
+            // Sort newest first
+            entries.sort((a, b) =>
+              new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0)
+            );
+
+            fs.writeFileSync('data.json', JSON.stringify(entries, null, 2));
+            console.log('Wrote ' + entries.length + ' entries to data.json');
+
+      - name: Commit and push data.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --cached --quiet || git commit -m "chore: update data.json [skip ci]"
+          git push
