@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "driver_name": "Test Driver",
+    "truck_plate": "SGX1234A",
+    "forwarder": "Test Forwarder",
+    "shipment_ref": "DO-TEST-001",
+    "awb": "123-45678",
+    "pallets": "2",
+    "cartons": "10",
+    "metro_car": "0",
+    "crate": "0",
+    "other": "",
+    "submitted_at": "2026-09-25T03:00:00.000Z",
+    "submitted_at_sgt": "25 Sep 2026, 11:00:00",
+    "status": "Pending",
+    "github_issue_num": 1
+  }
+]
