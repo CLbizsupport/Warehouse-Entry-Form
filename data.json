@@ -126,5 +126,25 @@
     "operatorName": "",
     "operatorRemarks": "",
     "verifiedAt": ""
+  },
+  {
+    "id": "ARR-20260926-0004",
+    "timestamp": "2026-09-26T14:08:06.334Z",
+    "status": "Pending",
+    "forwarder": "Schenker",
+    "doNumber": "33333333",
+    "awb": "1111111111",
+    "truckPlate": "WIS23232",
+    "cargo": {
+      "pallets": 32,
+      "cartons": 0,
+      "metroCart": 0,
+      "crates": 0,
+      "ado": 0
+    },
+    "corrections": {},
+    "operatorName": "",
+    "operatorRemarks": "",
+    "verifiedAt": ""
   }
 ]
