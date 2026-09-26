@@ -66,5 +66,25 @@
     "final_mc": null,
     "final_crates": null,
     "remarks": ""
+  },
+  {
+    "id": "ARR-20260926-0001",
+    "timestamp": "2026-09-26T14:06:21.582Z",
+    "status": "Pending",
+    "forwarder": "DSV",
+    "doNumber": "2321321321321",
+    "awb": "232132",
+    "truckPlate": "23232",
+    "cargo": {
+      "pallets": 10,
+      "cartons": 0,
+      "metroCart": 0,
+      "crates": 0,
+      "ado": 0
+    },
+    "corrections": {},
+    "operatorName": "",
+    "operatorRemarks": "",
+    "verifiedAt": ""
   }
 ]
