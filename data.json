@@ -106,5 +106,25 @@
     "operatorName": "",
     "operatorRemarks": "",
     "verifiedAt": ""
+  },
+  {
+    "id": "ARR-20260926-0003",
+    "timestamp": "2026-09-26T14:07:40.323Z",
+    "status": "Pending",
+    "forwarder": "DHL",
+    "doNumber": "22222222222",
+    "awb": "111111",
+    "truckPlate": "SJOW23232",
+    "cargo": {
+      "pallets": 22,
+      "cartons": 0,
+      "metroCart": 0,
+      "crates": 0,
+      "ado": 0
+    },
+    "corrections": {},
+    "operatorName": "",
+    "operatorRemarks": "",
+    "verifiedAt": ""
   }
 ]
