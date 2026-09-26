@@ -40,5 +40,31 @@
     "final_mc": null,
     "final_crates": null,
     "remarks": ""
+  },
+  {
+    "id": "DSV-1790430824969",
+    "delivery_order": "3",
+    "awb": "33",
+    "driver_name": "rrtrtr",
+    "truck_plate": "23432",
+    "forwarder": "333",
+    "ado_skid": 0,
+    "pallets": 0,
+    "cartons": 107,
+    "metro_car": 0,
+    "crates": 0,
+    "submitted_at": "2026-09-26T13:53:44.969Z",
+    "submitted_at_sgt": "26 Sept 2026, 21:53:44",
+    "status": "Pending",
+    "operator_name": "",
+    "verified_time": "",
+    "final_truck_plate": "",
+    "final_do": "",
+    "final_ado_skid": "",
+    "final_pallets": null,
+    "final_cartons": null,
+    "final_mc": null,
+    "final_crates": null,
+    "remarks": ""
   }
 ]
