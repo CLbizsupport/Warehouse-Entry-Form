@@ -11,12 +11,14 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root {
+:root{
   --navy:#0d1b2a;--blue:#1a3a6b;--blue2:#1e4d8c;
   --accent:#f4a72a;--green:#10b981;--red:#ef4444;--amber:#f59e0b;
   --bg:#f0f2f5;--card:#ffffff;--text:#111827;
   --text-muted:#6b7280;--border:#e5e7eb;--input-bg:#f9fafb;
   --shadow:0 2px 12px rgba(0,0,0,.08);
+  --sidebar-w:228px;
+  color-scheme:light;
 }
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f1117;--card:#1a1f2e;--text:#f1f5f9;--text-muted:#94a3b8;--border:#2d3748;--input-bg:#252d3d;color-scheme:dark;
@@ -27,911 +29,1435 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:15px;min-height:100vh}
 
-/* HEADER */
-.header{background:linear-gradient(135deg,#0d1b2a 0%,#1a3a6b 100%);padding:18px 20px 22px;color:#fff}
-.header-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.dsv-logo{background:var(--accent);color:#0d1b2a;font-weight:800;font-size:17px;padding:4px 10px;border-radius:5px;letter-spacing:1px;flex-shrink:0}
-.header-title{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.7;margin-top:12px}
-.header-heading{font-size:24px;font-weight:800;line-height:1.2;margin-top:2px}
-.header-sub{font-size:13px;opacity:.65;margin-top:4px}
-.op-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 22px;font-size:15px;font-weight:800;cursor:pointer;color:#0d1b2a;font-family:inherit;letter-spacing:.3px;flex-shrink:0}
-.op-btn:hover{opacity:.9}
+/* APP SHELL */
+.app-shell{display:flex;min-height:100vh}
 
-/* MAIN */
-.main{padding:20px 16px 60px;max-width:560px;margin:0 auto}
-.card{background:var(--card);border-radius:16px;padding:24px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar-w);background:var(--navy);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;z-index:200;
+  overflow-y:auto;flex-shrink:0;
+  transition:transform .3s;
+}
+.sidebar-brand{
+  padding:20px 18px 16px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;gap:10px;
+}
+.dsv-logo{
+  background:var(--accent);color:#0d1b2a;
+  font-weight:800;font-size:15px;padding:3px 9px;
+  border-radius:5px;letter-spacing:1px;flex-shrink:0;
+}
+.sidebar-sys-title{color:#fff;font-size:13px;font-weight:700;opacity:.85;line-height:1.3}
+.sidebar-sys-sub{color:rgba(255,255,255,.4);font-size:10px;margin-top:2px;letter-spacing:.5px}
+.sidebar-nav{flex:1;padding:14px 10px}
+.nav-section-label{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  color:rgba(255,255,255,.35);text-transform:uppercase;
+  padding:10px 10px 6px;margin-top:4px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:9px;
+  color:rgba(255,255,255,.65);font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .15s;margin-bottom:2px;
+  user-select:none;
+}
+.nav-item:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-item.active{background:var(--accent);color:#0d1b2a;font-weight:700}
+.nav-item.op-locked{opacity:.5}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sidebar-footer{
+  padding:14px 16px;border-top:1px solid rgba(255,255,255,.1);
+}
+.op-session-name{color:rgba(255,255,255,.9);font-size:12px;font-weight:600;margin-bottom:2px}
+.op-session-date{color:rgba(255,255,255,.4);font-size:11px;margin-bottom:10px}
+.exit-btn{
+  width:100%;padding:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+}
+.exit-btn:hover{background:rgba(255,255,255,.18)}
 
-/* FIELDS */
-.section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+/* MOBILE TOP BAR */
+.mobile-bar{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:150;
+  background:var(--navy);padding:12px 16px;
+  flex-direction:row;align-items:center;gap:12px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.hamburger{background:none;border:none;cursor:pointer;padding:4px;color:#fff;font-size:20px;flex-shrink:0}
+.mobile-logo{display:flex;align-items:center;gap:8px}
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;
+}
+.sidebar-overlay.open{display:block}
+
+/* CONTENT */
+.content{
+  margin-left:var(--sidebar-w);flex:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+.content-inner{flex:1;padding:28px 32px;max-width:1100px;width:100%}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:24px}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-.3px}
+.page-subtitle{font-size:13px;color:var(--text-muted);margin-top:4px}
+
+/* CARDS */
+.card{background:var(--card);border-radius:14px;padding:24px;box-shadow:var(--shadow);margin-bottom:18px}
+.card-section-title{
+  font-size:11px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);
+}
+
+/* FORM */
 .field{margin-bottom:16px}
-.field label{display:block;font-size:13px;font-weight:600;color:var(--text-muted);margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;background:var(--input-bg);color:var(--text);-webkit-appearance:none;transition:border-color .2s}
+.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.3px;color:var(--text-muted);margin-bottom:7px;text-transform:uppercase}
+.field input,.field select,.field textarea{
+  width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;
+  font-size:15px;font-family:inherit;background:var(--input-bg);color:var(--text);
+  -webkit-appearance:none;appearance:none;transition:border-color .2s;
+}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue)}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;
+}
 .required{color:var(--red);margin-left:2px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:600px){.field-row,.field-row-3{grid-template-columns:1fr}}
 
 /* CARGO GRID */
-.cargo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
-@media(max-width:400px){.cargo-grid{grid-template-columns:repeat(2,1fr)}}
-.cargo-box{background:var(--input-bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 10px 8px;text-align:center}
-.cargo-box label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
-.cargo-box input{width:100%;padding:8px 6px;border:1.5px solid var(--border);border-radius:7px;font-size:18px;font-weight:700;font-family:inherit;text-align:center;background:var(--card);color:var(--text)}
+.cargo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:520px){.cargo-grid{grid-template-columns:repeat(2,1fr)}}
+.cargo-box{
+  background:var(--input-bg);border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 10px 10px;text-align:center;
+}
+.cargo-box label{
+  display:block;font-size:10px;font-weight:700;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;
+}
+.cargo-box input{
+  width:100%;padding:8px 4px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:22px;font-weight:700;font-family:inherit;text-align:center;
+  background:var(--card);color:var(--text);-webkit-appearance:none;appearance:none;
+}
 .cargo-box input:focus{outline:none;border-color:var(--blue)}
 
 /* BUTTONS */
-.btn{display:block;width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity .2s,transform .1s;text-align:center}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 24px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;font-family:inherit;
+  cursor:pointer;transition:opacity .2s,transform .1s;
+}
 .btn:active{transform:scale(.98)}
 .btn-primary{background:var(--blue);color:#fff}
 .btn-primary:hover{background:var(--blue2)}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
 .btn-success{background:var(--green);color:#fff}
 .btn-amber{background:var(--amber);color:#fff}
-.btn-row{display:flex;gap:10px;margin-top:6px}
-.btn-row .btn{flex:1}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-full{width:100%;display:flex}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
 
 /* SUCCESS */
 .success-screen{text-align:center;padding:20px 0}
-.success-icon{font-size:64px;margin-bottom:14px}
+.success-icon{font-size:64px;margin-bottom:16px}
 .success-title{font-size:26px;font-weight:800;color:var(--green);margin-bottom:8px}
-.success-sub{color:var(--text-muted);margin-bottom:24px;line-height:1.6;font-size:14px}
-.success-ref{background:var(--bg);border-radius:12px;padding:14px 20px;margin-bottom:28px}
-.success-ref-main{font-size:20px;font-weight:700;letter-spacing:.5px}
+.success-sub{color:var(--text-muted);margin-bottom:28px;line-height:1.7;font-size:14px}
+.success-ref{background:var(--bg);border-radius:14px;padding:18px 24px;margin-bottom:32px;display:inline-block;min-width:260px}
+.success-ref-id{font-size:22px;font-weight:700}
 .success-ref-time{font-size:13px;color:var(--text-muted);margin-top:4px}
 
-/* PIN */
-.pin-screen{text-align:center;padding:8px 0}
-.pin-title{font-size:20px;font-weight:700;margin-bottom:8px}
-.pin-sub{color:var(--text-muted);font-size:14px;margin-bottom:28px}
-.pin-dots{display:flex;justify-content:center;gap:12px;margin-bottom:32px}
+/* PIN OVERLAY */
+.pin-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.pin-overlay.open{display:flex}
+.pin-modal{
+  background:var(--card);border-radius:20px;padding:32px 28px;
+  width:100%;max-width:340px;text-align:center;
+}
+.pin-title{font-size:20px;font-weight:700;margin-bottom:6px}
+.pin-sub{color:var(--text-muted);font-size:13px;margin-bottom:24px}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:28px}
 .pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .15s}
 .pin-dot.filled{background:var(--blue);border-color:var(--blue)}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:280px;margin:0 auto}
-.pin-key{padding:18px;border:1.5px solid var(--border);border-radius:12px;font-size:20px;font-weight:600;background:var(--card);color:var(--text);cursor:pointer;font-family:inherit}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pin-key{
+  padding:15px;border:1.5px solid var(--border);border-radius:12px;
+  font-size:20px;font-weight:600;background:var(--card);color:var(--text);
+  cursor:pointer;font-family:inherit;
+}
 .pin-key:active{background:var(--bg)}
 .pin-error{color:var(--red);font-size:13px;margin-top:14px;min-height:20px}
+.pin-cancel-link{
+  margin-top:16px;color:var(--text-muted);font-size:13px;cursor:pointer;
+  background:none;border:none;font-family:inherit;
+}
 
-/* CONSOLE */
-.console-wrap{display:flex;flex-direction:column;height:calc(100vh - 130px);overflow:hidden}
-.console-tabs{display:flex;background:#0d1b2a;overflow-x:auto}
-.console-tab{flex:1;min-width:80px;padding:13px 8px;border:none;background:transparent;color:rgba(255,255,255,.55);font-size:12px;font-weight:700;letter-spacing:.4px;cursor:pointer;font-family:inherit;border-bottom:3px solid transparent;text-transform:uppercase;white-space:nowrap;transition:all .2s}
-.console-tab.active{color:#fff;border-bottom-color:var(--accent)}
-.console-top-bar{background:#0d1b2a;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
-.op-session-tag{color:rgba(255,255,255,.85);font-size:13px;font-weight:600}
-.exit-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit}
-.console-body{flex:1;overflow-y:auto;padding:16px}
+/* OPERATOR NAME MODAL */
+.name-modal{background:var(--card);border-radius:20px;padding:32px 28px;width:100%;max-width:360px}
+.name-modal-icon{font-size:44px;margin-bottom:14px;text-align:center}
+.name-modal-title{font-size:19px;font-weight:700;text-align:center;margin-bottom:6px}
+.name-modal-sub{color:var(--text-muted);font-size:13px;text-align:center;margin-bottom:22px}
 
-/* SEARCH + FILTER PILLS */
-.search-bar{margin-bottom:12px}
-.search-bar input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--input-bg);color:var(--text)}
-.search-bar input:focus{outline:none;border-color:var(--blue)}
+/* STAT TILES */
+.stat-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+@media(max-width:520px){.stat-tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--card);border-radius:12px;padding:16px;box-shadow:var(--shadow);text-align:center}
+.tile-num{font-size:32px;font-weight:800;line-height:1}
+.tile-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-top:4px}
+.tile-total .tile-num{color:var(--blue)}
+.tile-pending .tile-num{color:#f59e0b}
+.tile-verified .tile-num{color:var(--green)}
+.tile-today .tile-num{color:#8b5cf6}
+
+/* FILTER PILLS */
 .filter-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;transition:all .15s}
+.pill{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--card);color:var(--text-muted);cursor:pointer;transition:all .15s}
 .pill.active{background:var(--blue);border-color:var(--blue);color:#fff}
 
-/* ENTRY CARDS */
-.entry-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+/* SEARCH */
+.search-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--input-bg);color:var(--text);margin-bottom:12px}
+.search-input:focus{outline:none;border-color:var(--blue)}
+
+/* ENTRY CARDS (verify list) */
+.entry-card{
+  background:var(--card);border:1.5px solid var(--border);border-radius:12px;
+  padding:14px 16px;margin-bottom:9px;cursor:pointer;transition:border-color .2s,box-shadow .2s;
+}
 .entry-card:hover{border-color:var(--blue);box-shadow:var(--shadow)}
-.entry-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px}
-.entry-id{font-size:14px;font-weight:700}
-.status-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.entry-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;gap:8px;flex-wrap:wrap}
+.entry-id{font-size:13px;font-weight:700}
+.status-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
 .badge-pending{background:#fef3c7;color:#92400e}
 .badge-verified{background:#d1fae5;color:#065f46}
-.badge-amended{background:#dbeafe;color:#1e40af}
-.entry-card-meta{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.entry-card-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:4px}
+@media(min-width:700px){.entry-card-meta{grid-template-columns:repeat(4,1fr)}}
 .meta-item{font-size:12px;color:var(--text-muted)}
 .meta-item span{color:var(--text);font-weight:500}
 
 /* VERIFY TABLE */
-.verify-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px}
-.verify-table th{text-align:left;padding:8px 10px;background:var(--bg);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border)}
-.verify-table td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.verify-table{width:100%;border-collapse:collapse;font-size:13px}
+.verify-table th{text-align:left;padding:8px 12px;background:var(--bg);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border)}
+.verify-table td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
 .verify-table tr:last-child td{border-bottom:none}
-.field-name-col{font-weight:600;color:var(--text-muted);font-size:12px;width:26%}
-.driver-val-col{color:var(--text);width:34%}
-.edit-input{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;background:var(--input-bg);color:var(--text)}
+.field-name-col{font-weight:600;color:var(--text-muted);font-size:12px;white-space:nowrap;width:22%}
+.driver-val-col{color:var(--text);width:30%}
+.edit-input{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--input-bg);color:var(--text)}
 .edit-input:focus{outline:none;border-color:var(--blue)}
 .edit-input.changed{border-color:var(--amber);background:#fffbeb}
 .total-row td{font-weight:700;font-size:14px;background:var(--bg)}
-.remarks-area{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--input-bg);color:var(--text);resize:vertical;min-height:70px}
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+.remarks-area{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--input-bg);color:var(--text);resize:vertical;min-height:72px}
 .remarks-area:focus{outline:none;border-color:var(--blue)}
-.back-btn{display:flex;align-items:center;gap:6px;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;background:none;border:none;font-family:inherit;padding:0}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;background:none;border:none;font-family:inherit;padding:0}
 .back-btn:hover{color:var(--text)}
 
-/* SUMMARY TABLE */
-.stat-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
-@media(max-width:480px){.stat-tiles{grid-template-columns:repeat(2,1fr)}}
-.tile{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center}
-.tile-num{font-size:28px;font-weight:800;line-height:1}
-.tile-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-top:4px}
-.tile-total .tile-num{color:var(--blue)}
-.tile-pending .tile-num{color:#f59e0b}
-.tile-verified .tile-num{color:var(--green)}
-.tile-amended .tile-num{color:#3b82f6}
-.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
-.data-table{width:100%;border-collapse:collapse;font-size:13px;min-width:680px}
-.data-table th{padding:10px 12px;background:var(--bg);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
-.data-table tr:last-child td{border-bottom:none}
-.data-table tr:hover td{background:var(--bg)}
-.id-cell{font-weight:700;font-size:12px}
-
-/* CHARTS */
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-@media(max-width:520px){.chart-grid{grid-template-columns:1fr}}
-.chart-card{background:var(--card);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
-.chart-title{font-size:12px;font-weight:700;margin-bottom:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px}
-.chart-container{position:relative;height:180px}
-.chart-container-wide{position:relative;height:190px}
-
-/* PRINT TAB UI */
-.print-search-wrap{background:var(--card);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
-.print-results{margin-top:12px}
-.print-entry-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px}
+/* PRINT */
+.print-entry-row{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;margin-bottom:7px}
 .print-entry-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--blue);flex-shrink:0;cursor:pointer}
 .print-entry-info{flex:1;min-width:0}
 .print-entry-id{font-size:13px;font-weight:700}
 .print-entry-meta{font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.print-entry-badge{flex-shrink:0}
-.select-all-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;font-weight:600;color:var(--text-muted)}
+.select-all-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--text-muted)}
 .select-all-row input{width:16px;height:16px;accent-color:var(--blue);cursor:pointer}
-.print-actions{display:flex;gap:10px;margin-top:14px}
-.print-actions .btn{flex:1;padding:12px}
+
+/* SUMMARY TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;min-width:980px}
+.data-table th{padding:9px 12px;background:var(--bg);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+.id-cell{font-weight:700;font-size:12px;white-space:nowrap}
+
+/* SUMMARY FILTER ROW */
+#sumFilterRow td{background:var(--bg);border-bottom:2px solid var(--border)}
+.sum-filter-inp{width:100%;padding:5px 7px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:inherit;background:var(--input-bg);color:var(--text)}
+.sum-filter-inp:focus{outline:none;border-color:var(--blue)}
+.sum-filter-inp[type="select"],.sum-filter-inp select{padding:4px 5px}
+
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:640px){.chart-grid{grid-template-columns:1fr}}
+.chart-card{background:var(--card);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.chart-title{font-size:11px;font-weight:700;margin-bottom:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px}
+.chart-container{position:relative;height:190px}
+.chart-container-wide{position:relative;height:200px}
 
 /* MISC */
 .page{display:none}
 .page.active{display:block}
-.op-sub-view{display:none}
-.op-sub-view.active{display:block}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1f2937;color:#fff;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;z-index:9999;transition:transform .3s;pointer-events:none}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.loading{text-align:center;padding:30px;color:var(--text-muted);font-size:14px}
-.empty-state{text-align:center;padding:30px 20px;color:var(--text-muted)}
+.loading{text-align:center;padding:32px;color:var(--text-muted);font-size:14px}
+.empty-state{text-align:center;padding:32px 20px;color:var(--text-muted)}
 .empty-icon{font-size:40px;margin-bottom:8px}
-.section-heading{font-size:15px;font-weight:700;margin-bottom:14px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:#1f2937;color:#fff;padding:11px 22px;border-radius:100px;font-size:14px;font-weight:600;z-index:9999;transition:transform .3s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.section-divider{border:none;border-top:1px solid var(--border);margin:20px 0}
 
-/* ════════════════════════════════════════
-   PRINT STYLES — only these show when printing
-   ════════════════════════════════════════ */
-@media print {
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  body > *:not(#printRoot) { display: none !important; }
-  #printRoot { display: block !important; }
-  .print-page-break { page-break-after: always; }
-  .pr-page { padding: 14mm 14mm 10mm; font-family: 'Inter', Arial, sans-serif; font-size: 11pt; color: #000; }
-  .pr-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2.5px solid #0d1b2a; padding-bottom: 10px; margin-bottom: 14px; }
-  .pr-logo { font-size: 20pt; font-weight: 800; color: #0d1b2a; letter-spacing: 1px; }
-  .pr-title { font-size: 13pt; font-weight: 700; color: #0d1b2a; }
-  .pr-meta { font-size: 9pt; color: #555; margin-top: 3px; }
-  .pr-page-num { font-size: 10pt; font-weight: 700; color: #0d1b2a; text-align: right; }
-  .pr-section-title { font-size: 9pt; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #555; border-bottom: 1px solid #ccc; padding-bottom: 3px; margin: 14px 0 8px; }
-  .pr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 20px; }
-  .pr-field { margin-bottom: 5px; }
-  .pr-field-label { font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #666; }
-  .pr-field-value { font-size: 11pt; font-weight: 600; border-bottom: 1px solid #ddd; padding-bottom: 2px; min-height: 18px; }
-  .pr-cargo-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-  .pr-cargo-table th { text-align: left; padding: 5px 8px; background: #f0f2f5; font-size: 9pt; font-weight: 700; border: 1px solid #ccc; }
-  .pr-cargo-table td { padding: 6px 8px; border: 1px solid #ccc; font-size: 11pt; }
-  .pr-cargo-table .pr-total-row td { font-weight: 800; background: #e8e8e8; }
-  .pr-sig-row { display: flex; gap: 30px; margin-top: 20px; }
-  .pr-sig-box { flex: 1; border-top: 1px solid #000; padding-top: 4px; font-size: 8pt; color: #555; }
-  .pr-stamp-box { width: 70px; height: 70px; border: 2px solid #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7pt; color: #aaa; text-align: center; }
-  .pr-footer { margin-top: 14px; text-align: center; font-size: 7.5pt; color: #aaa; border-top: 1px solid #eee; padding-top: 6px; }
+/* PRINT LABELS */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body>*:not(#printRoot){display:none!important}
+  #printRoot{display:block!important;padding:8mm}
+  .pr-labels-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8mm}
+  .pr-label{border:2px solid #000;padding:7mm 8mm;page-break-inside:avoid;font-family:Arial,sans-serif;background:#fff;color:#000}
+  .pr-label-logo{font-size:13pt;font-weight:800;letter-spacing:1px;margin-bottom:4mm;padding-bottom:3mm;border-bottom:2px solid #000}
+  .pr-label-table{width:100%;border-collapse:collapse}
+  .pr-lk{font-size:9pt;font-weight:600;color:#444;padding:2.5mm 2mm 2.5mm 0;vertical-align:top;white-space:nowrap;width:42%;border-bottom:1px solid #ddd}
+  .pr-lv{font-size:9pt;padding:2.5mm 0 2.5mm 2mm;border-bottom:1px solid #ddd;font-weight:500}
+  .pr-lv.pr-big{font-size:16pt;font-weight:800;color:#000;line-height:1.1;border-bottom:1px solid #ddd}
+  .pr-lv.pr-time{font-size:18pt;font-weight:800;text-align:right;color:#000;border-bottom:none}
+  .pr-lk.last{border-bottom:none}
 }
-#printRoot { display: none; }
+#printRoot{display:none}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .content{margin-left:0}
+  .mobile-bar{display:flex}
+  .content-inner{padding:76px 16px 28px}
+  .field-row{grid-template-columns:1fr}
+  .field-row-3{grid-template-columns:1fr 1fr}
+}
+@media(min-width:769px){
+  .mobile-bar{display:none}
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header" id="mainHeader">
-  <div class="header-row">
-    <div class="dsv-logo">DSV</div>
-    <button class="op-btn" onclick="openOp()">⚙ Operator</button>
-  </div>
-  <div class="header-title">Warehouse Gate System</div>
-  <div class="header-heading">Driver Check-In</div>
-  <div class="header-sub">Register your arrival at the gate</div>
-</div>
-
-<!-- ═══ DRIVER PAGES ═══ -->
-<div class="main" id="driverMain">
-  <div class="page active" id="dPageForm">
-    <div class="card">
-      <div class="section-label">Shipment Information</div>
-      <div class="field">
-        <label>Forwarder Name<span class="required">*</span></label>
-        <input type="text" id="forwarder" placeholder="e.g. Schenker, Expeditors, Kuehne+Nagel">
-      </div>
-      <div class="field">
-        <label>Delivery Order (DO) Number<span class="required">*</span></label>
-        <input type="text" id="doNumber" placeholder="DO reference number">
-      </div>
-      <div class="field">
-        <label>AWB / Reference</label>
-        <input type="text" id="awb" placeholder="Air Waybill or tracking number">
-      </div>
-      <div class="field">
-        <label>Truck Plate Number<span class="required">*</span></label>
-        <input type="text" id="truckPlate" placeholder="e.g. WXY 1234" style="text-transform:uppercase">
-      </div>
-      <div class="section-label" style="margin-top:8px">Cargo Quantity</div>
-      <div class="cargo-grid">
-        <div class="cargo-box"><label>Pallets</label><input type="number" id="qPallets" value="0" min="0"></div>
-        <div class="cargo-box"><label>Cartons</label><input type="number" id="qCartons" value="0" min="0"></div>
-        <div class="cargo-box"><label>Metro Cart</label><input type="number" id="qMetroCart" value="0" min="0"></div>
-        <div class="cargo-box"><label>Crates</label><input type="number" id="qCrates" value="0" min="0"></div>
-        <div class="cargo-box"><label>ADO/SKID</label><input type="number" id="qADO" value="0" min="0"></div>
-      </div>
-      <button class="btn btn-primary" style="margin-top:22px" onclick="submitDriver()">Submit Check-In</button>
-    </div>
-  </div>
-
-  <div class="page" id="dPageSuccess">
-    <div class="card success-screen">
-      <div class="success-icon">✅</div>
-      <div class="success-title">Check-In Successful!</div>
-      <div class="success-sub">Your arrival has been recorded.<br>Please wait for the operator to verify your entry.</div>
-      <div class="success-ref">
-        <div class="success-ref-main" id="successRef">—</div>
-        <div class="success-ref-time" id="successTime">—</div>
-      </div>
-      <button class="btn btn-primary" onclick="resetDriver()">🏠 Return to Home</button>
-    </div>
+<!-- MOBILE TOP BAR -->
+<div class="mobile-bar" id="mobileBar">
+  <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
+  <div class="mobile-logo">
+    <span class="dsv-logo">DSV</span>
+    <span style="color:#fff;font-size:13px;font-weight:600;opacity:.8">Gate System</span>
   </div>
 </div>
 
-<!-- ═══ OPERATOR PAGES ═══ -->
-<div id="operatorMain" style="display:none">
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-  <!-- PIN -->
-  <div class="main" id="opPinPage">
-    <div class="card">
-      <div class="pin-screen">
-        <div class="pin-title">🔐 Operator Access</div>
-        <div class="pin-sub">Enter your 4-digit PIN to continue</div>
-        <div class="pin-dots">
-          <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-          <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <span class="dsv-logo">DSV</span>
+    <div>
+      <div class="sidebar-sys-title">Gate System</div>
+      <div class="sidebar-sys-sub">WAREHOUSE OPERATIONS</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Driver</div>
+    <div class="nav-item active" id="ni-driver" onclick="navTo('driver')">
+      <span class="nav-icon">&#128230;</span> Registration
+    </div>
+
+    <div class="nav-section-label" style="margin-top:10px">Operator</div>
+    <div class="nav-item op-item" id="ni-verify" onclick="navOp('verify')">
+      <span class="nav-icon">&#9989;</span> Verification
+    </div>
+    <div class="nav-item op-item" id="ni-print" onclick="navOp('print')">
+      <span class="nav-icon">&#128424;</span> Printing
+    </div>
+    <div class="nav-item op-item" id="ni-summary" onclick="navOp('summary')">
+      <span class="nav-icon">&#128203;</span> Summary
+    </div>
+    <div class="nav-item op-item" id="ni-charts" onclick="navOp('charts')">
+      <span class="nav-icon">&#128202;</span> Dashboard
+    </div>
+
+    <div id="demoBtn" style="margin-top:20px">
+      <div onclick="loadDemoMode()" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;border:1px dashed rgba(255,255,255,.25);color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;">
+        <span>&#129514;</span> Load Demo Data
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer" id="sidebarFooter" style="display:none">
+    <div class="op-session-name" id="opSideTag">Operator</div>
+    <div class="op-session-date" id="opSideDate"></div>
+    <button class="exit-btn" onclick="exitConsole()">&#8617; Exit Operator</button>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="app-shell">
+<div class="content" id="mainContent">
+<div class="content-inner">
+
+  <!-- DRIVER REGISTRATION -->
+  <div class="page active" id="pageDriver">
+    <div id="driverFormView">
+      <div class="page-header">
+        <div class="page-title">&#128230; Driver Registration</div>
+        <div class="page-subtitle">Register your cargo arrival — complete all sections below.</div>
+      </div>
+
+      <!-- Section 1 -->
+      <div class="card">
+        <div class="card-section-title">Section 1 — Driver &amp; Shipment Information</div>
+        <div class="field">
+          <label>Truck Plate<span class="required">*</span></label>
+          <input type="text" id="truckPlate" placeholder="e.g. SGX1234A" style="text-transform:uppercase">
         </div>
-        <div class="pin-pad">
-          <button class="pin-key" onclick="pinPress('1')">1</button>
-          <button class="pin-key" onclick="pinPress('2')">2</button>
-          <button class="pin-key" onclick="pinPress('3')">3</button>
-          <button class="pin-key" onclick="pinPress('4')">4</button>
-          <button class="pin-key" onclick="pinPress('5')">5</button>
-          <button class="pin-key" onclick="pinPress('6')">6</button>
-          <button class="pin-key" onclick="pinPress('7')">7</button>
-          <button class="pin-key" onclick="pinPress('8')">8</button>
-          <button class="pin-key" onclick="pinPress('9')">9</button>
-          <button class="pin-key" onclick="pinPress('clear')">⌫</button>
-          <button class="pin-key" onclick="pinPress('0')">0</button>
-          <button class="pin-key" onclick="pinPress('cancel')">✕</button>
+        <div class="field">
+          <label>Forwarder<span class="required">*</span></label>
+          <select id="forwarder">
+            <option value="">&#8212; Select Forwarder &#8212;</option>
+            <option>DHL Global Forwarding</option>
+            <option>Schenker</option>
+            <option>Kuehne+Nagel</option>
+            <option>Expeditors</option>
+            <option>Nippon Express</option>
+            <option>CEVA Logistics</option>
+            <option>Geodis</option>
+            <option>Bollore Logistics</option>
+            <option>Kerry Logistics</option>
+            <option>CMA CGM</option>
+            <option>Agility</option>
+            <option>DSV</option>
+            <option>Other</option>
+          </select>
         </div>
-        <div class="pin-error" id="pinError"></div>
-        <button onclick="loadDemoMode()" style="margin-top:22px;background:none;border:1.5px dashed var(--border);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit;width:100%">🧪 Load Demo Data (Testing)</button>
+        <div class="field-row">
+          <div class="field">
+            <label>Delivery Order (DO)<span class="required">*</span></label>
+            <input type="text" id="doNumber" placeholder="e.g. DO-123456">
+          </div>
+          <div class="field">
+            <label>AWB<span class="required">*</span></label>
+            <input type="text" id="awb" placeholder="e.g. 618-12345678">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2 -->
+      <div class="card">
+        <div class="card-section-title">Section 2 — Cargo Quantity<span class="required" style="font-size:11px;margin-left:6px">At least one quantity required</span></div>
+        <div class="cargo-grid">
+          <div class="cargo-box">
+            <label>ADO / SKID</label>
+            <input type="text" inputmode="numeric" id="qADO" placeholder="0">
+          </div>
+          <div class="cargo-box">
+            <label>Pallets</label>
+            <input type="text" inputmode="numeric" id="qPallets" placeholder="0">
+          </div>
+          <div class="cargo-box">
+            <label>Cartons</label>
+            <input type="text" inputmode="numeric" id="qCartons" placeholder="0">
+          </div>
+          <div class="cargo-box">
+            <label>Metro Cart</label>
+            <input type="text" inputmode="numeric" id="qMetroCart" placeholder="0">
+          </div>
+          <div class="cargo-box">
+            <label>Crates</label>
+            <input type="text" inputmode="numeric" id="qCrates" placeholder="0">
+          </div>
+          <div class="cargo-box">
+            <label>Other</label>
+            <input type="text" inputmode="numeric" id="qOther" placeholder="0">
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px">
+          <label>Other Description</label>
+          <input type="text" id="qOtherDesc" placeholder="Describe if Other quantity is entered">
+        </div>
+        <div style="margin-top:20px">
+          <button class="btn btn-success btn-full" id="submitBtn" onclick="submitDriver()">
+            &#10003; Submit Check-In
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div id="driverSuccessView" style="display:none">
+      <div class="card success-screen">
+        <div class="success-icon">&#9989;</div>
+        <div class="success-title">Check-In Successful!</div>
+        <div class="success-sub">Your arrival has been recorded.<br>Please wait for the operator to verify your entry.</div>
+        <div class="success-ref">
+          <div class="success-ref-id" id="successRef">&#8212;</div>
+          <div class="success-ref-time" id="successTime">&#8212;</div>
+        </div>
+        <button class="btn btn-primary" onclick="resetDriver()">&#127968; New Registration</button>
       </div>
     </div>
   </div>
 
-  <!-- Name -->
-  <div class="main" id="opNamePage" style="display:none">
-    <div class="card">
-      <div style="text-align:center;padding:8px 0 16px">
-        <div style="font-size:40px;margin-bottom:12px">👤</div>
-        <div style="font-size:20px;font-weight:700;margin-bottom:6px">Welcome, Operator!</div>
-        <div style="color:var(--text-muted);font-size:14px;margin-bottom:24px">Enter your name to start your session</div>
+  <!-- VERIFY -->
+  <div class="page" id="pageVerify">
+    <div class="page-header">
+      <div class="page-title">&#9989; Verification</div>
+      <div class="page-subtitle">Review and verify driver cargo entries.</div>
+    </div>
+
+    <div id="verifyListView">
+      <input type="text" class="search-input" id="searchInput" placeholder="&#128269; Search by DO, AWB, plate, driver, forwarder..." oninput="renderList()">
+      <div class="filter-pills">
+        <div class="pill active" data-filter="all" onclick="setFilter(this)">All</div>
+        <div class="pill" data-filter="Pending" onclick="setFilter(this)">Pending</div>
+        <div class="pill" data-filter="Verified" onclick="setFilter(this)">Verified</div>
       </div>
+      <div id="entriesList"><div class="loading">Loading entries...</div></div>
+    </div>
+
+    <div id="verifyDetailView" style="display:none">
+      <button class="back-btn" onclick="backToList()">&#8592; Back to list</button>
+      <div class="card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:17px;font-weight:700" id="vEntryId">&#8212;</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="vEntryTime">&#8212;</div>
+          </div>
+          <span class="status-badge" id="vBadge">&#8212;</span>
+        </div>
+
+        <div class="card-section-title">Driver Information</div>
+        <div class="table-wrap" style="margin-bottom:16px">
+          <table class="verify-table">
+            <thead><tr>
+              <th class="field-name-col">Field</th>
+              <th class="driver-val-col">Driver Input</th>
+              <th>Operator Correction (edit if needed)</th>
+            </tr></thead>
+            <tbody id="verifyTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card-section-title">Cargo Quantity</div>
+        <div class="table-wrap" style="margin-bottom:16px">
+          <table class="verify-table">
+            <thead><tr><th>Type</th><th>Driver Input</th><th>Operator Correction (edit if needed)</th></tr></thead>
+            <tbody id="cargoTableBody"></tbody>
+            <tfoot><tr class="total-row">
+              <td style="padding:8px 12px">Total Units</td>
+              <td style="padding:8px 12px" id="totalDriverQty">0</td>
+              <td style="padding:8px 12px" id="totalCorrQty">0</td>
+            </tr></tfoot>
+          </table>
+        </div>
+
+        <div class="card-section-title">Operator Details</div>
+        <div class="field">
+          <label>Total Lines<span class="required">*</span></label>
+          <input type="text" inputmode="numeric" id="opTotalLines" placeholder="Enter total number of lines" class="edit-input" style="max-width:220px">
+        </div>
+        <div class="field">
+          <label>Remarks (optional)</label>
+          <textarea class="remarks-area" id="opRemarks" placeholder="Add any notes or remarks..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="backToList()">Cancel</button>
+          <button class="btn btn-success" onclick="saveVerify()">&#10003; Save &amp; Verify</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINT -->
+  <div class="page" id="pagePrint">
+    <div class="page-header">
+      <div class="page-title">&#128424; Printing</div>
+      <div class="page-subtitle">Select verified entries to print cargo labels. Pending entries cannot be printed.</div>
+    </div>
+    <div class="card">
+      <div class="field-row" style="margin-bottom:12px">
+        <div class="field" style="margin-bottom:0">
+          <label>Filter by Status</label>
+          <select id="printFilterStatus" onchange="renderPrintList()" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--input-bg);color:var(--text);width:100%">
+            <option value="Verified">Verified only</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Search</label>
+          <input type="text" id="printSearch" placeholder="DO / driver / plate..." oninput="renderPrintList()" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--input-bg);color:var(--text);width:100%">
+        </div>
+      </div>
+      <hr class="section-divider">
+      <div class="select-all-row">
+        <input type="checkbox" id="selectAllChk" onchange="toggleSelectAll(this)">
+        <label for="selectAllChk" style="cursor:pointer">Select All</label>
+        <span id="selectedCount" style="margin-left:auto;font-size:12px;color:var(--blue);font-weight:700"></span>
+      </div>
+      <div id="printList"><div class="loading">Loading...</div></div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn btn-outline" onclick="clearPrintSelection()">Clear Selection</button>
+        <button class="btn btn-amber" onclick="doPrint()">&#128424; Print Labels</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="page" id="pageSummary">
+    <div class="page-header">
+      <div class="page-title">&#128203; Summary</div>
+      <div class="page-subtitle">All cargo arrival records with timestamps.</div>
+    </div>
+    <div class="stat-tiles">
+      <div class="tile tile-total"><div class="tile-num" id="tTotal">0</div><div class="tile-label">Total</div></div>
+      <div class="tile tile-pending"><div class="tile-num" id="tPending">0</div><div class="tile-label">Pending</div></div>
+      <div class="tile tile-verified"><div class="tile-num" id="tVerified">0</div><div class="tile-label">Verified</div></div>
+      <div class="tile tile-today"><div class="tile-num" id="tToday">0</div><div class="tile-label">Today</div></div>
+    </div>
+    <div class="filter-pills">
+      <div class="pill active" data-sfilter="all" onclick="setSumFilter(this)">All Dates</div>
+      <div class="pill" data-sfilter="today" onclick="setSumFilter(this)">Today</div>
+      <div class="pill" data-sfilter="week" onclick="setSumFilter(this)">This Week</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-outline" onclick="exportSummaryCSV()" style="font-size:13px;padding:9px 18px">&#128190; Export to CSV</button>
+      <span id="sumExportMsg" style="font-size:12px;color:var(--text-muted)"></span>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Driver Submit Time</th><th>Operator Verified Time</th><th>Status</th>
+            <th>Forwarder</th><th>DO No.</th><th>AWB</th><th>Plate</th>
+            <th>PLT</th><th>CRT</th><th>MC</th><th>Crate</th><th>ADO/SKID</th><th>Other</th>
+            <th>Total Units</th><th>Total Lines</th><th>Remarks</th><th>Entry ID</th>
+          </tr>
+          <tr id="sumFilterRow">
+            <td colspan="2" style="padding:5px 4px"><input class="sum-filter-inp" id="sfDate" placeholder="Filter date..." oninput="renderSummary()"></td>
+            <td style="padding:5px 4px">
+              <select class="sum-filter-inp" id="sfStatus" onchange="renderSummary()">
+                <option value="">All</option><option>Pending</option><option>Verified</option>
+              </select>
+            </td>
+            <td style="padding:5px 4px"><input class="sum-filter-inp" id="sfForwarder" placeholder="Forwarder..." oninput="renderSummary()"></td>
+            <td style="padding:5px 4px"><input class="sum-filter-inp" id="sfDO" placeholder="DO..." oninput="renderSummary()"></td>
+            <td style="padding:5px 4px"><input class="sum-filter-inp" id="sfAWB" placeholder="AWB..." oninput="renderSummary()"></td>
+            <td style="padding:5px 4px"><input class="sum-filter-inp" id="sfPlate" placeholder="Plate..." oninput="renderSummary()"></td>
+            <td colspan="7" style="padding:5px 4px"></td>
+            <td colspan="2" style="padding:5px 4px"></td>
+            <td style="padding:5px 4px"><input class="sum-filter-inp" id="sfEntryId" placeholder="ID..." oninput="renderSummary()"></td>
+          </tr>
+        </thead>
+        <tbody id="summaryTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="page" id="pageCharts">
+    <div class="page-header">
+      <div class="page-title">&#128202; Dashboard</div>
+      <div class="page-subtitle">Arrivals analytics and operational overview.</div>
+    </div>
+    <div class="stat-tiles">
+      <div class="tile tile-total"><div class="tile-num" id="cTotal">0</div><div class="tile-label">Total</div></div>
+      <div class="tile tile-pending"><div class="tile-num" id="cPending">0</div><div class="tile-label">Pending</div></div>
+      <div class="tile tile-verified"><div class="tile-num" id="cVerified">0</div><div class="tile-label">Verified</div></div>
+      <div class="tile tile-today"><div class="tile-num" id="cToday">0</div><div class="tile-label">Today</div></div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">Status Breakdown</div>
+        <div class="chart-container"><canvas id="chartDonut"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">By Forwarder (Top 7)</div>
+        <div class="chart-container"><canvas id="chartBar"></canvas></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">7-Day Daily Arrivals</div>
+      <div class="chart-container-wide"><canvas id="chartLine"></canvas></div>
+    </div>
+  </div>
+
+</div><!-- /.content-inner -->
+</div><!-- /.content -->
+</div><!-- /.app-shell -->
+
+<!-- PIN OVERLAY -->
+<div class="pin-overlay" id="pinOverlay">
+  <div id="pinModalWrap">
+    <div class="pin-modal" id="pinStep">
+      <div style="font-size:38px;margin-bottom:12px">&#128272;</div>
+      <div class="pin-title">Operator Access</div>
+      <div class="pin-sub">Enter your 4-digit PIN to continue</div>
+      <div class="pin-dots">
+        <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+        <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
+      </div>
+      <div class="pin-pad">
+        <button class="pin-key" onclick="pinPress('1')">1</button>
+        <button class="pin-key" onclick="pinPress('2')">2</button>
+        <button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button>
+        <button class="pin-key" onclick="pinPress('5')">5</button>
+        <button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button>
+        <button class="pin-key" onclick="pinPress('8')">8</button>
+        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key" onclick="pinPress('clear')">&#9003;</button>
+        <button class="pin-key" onclick="pinPress('0')">0</button>
+        <button class="pin-key" onclick="closePinOverlay()">&#10005;</button>
+      </div>
+      <div class="pin-error" id="pinError"></div>
+    </div>
+    <div class="name-modal" id="nameStep" style="display:none">
+      <div class="name-modal-icon">&#128100;</div>
+      <div class="name-modal-title">Welcome, Operator!</div>
+      <div class="name-modal-sub">Enter your name to begin your session</div>
       <div class="field">
         <label>Your Name</label>
-        <input type="text" id="operatorName" placeholder="Enter your name" style="font-size:18px;text-align:center">
+        <input type="text" id="operatorName" placeholder="Enter your name" style="font-size:17px;text-align:center">
       </div>
-      <button class="btn btn-primary" style="margin-top:8px" onclick="confirmOpName()">Enter Console →</button>
+      <button class="btn btn-primary btn-full" style="margin-top:10px" onclick="confirmOpName()">Enter Console &#8594;</button>
     </div>
   </div>
+</div>
 
-  <!-- Console -->
-  <div id="opConsole" style="display:none">
-    <div class="console-wrap">
-      <div class="console-top-bar">
-        <div class="op-session-tag" id="opSessionTag">Operator</div>
-        <button class="exit-btn" onclick="exitConsole()">↩ Exit</button>
-      </div>
-      <div class="console-tabs">
-        <button class="console-tab active" onclick="switchTab('verify')">🔍 Verify</button>
-        <button class="console-tab" onclick="switchTab('print')">🖨 Print</button>
-        <button class="console-tab" onclick="switchTab('summary')">📋 Summary</button>
-        <button class="console-tab" onclick="switchTab('charts')">📊 Charts</button>
-      </div>
-      <div class="console-body">
-
-        <!-- ── VERIFY TAB ── -->
-        <div class="op-sub-view active" id="tab-verify">
-          <div id="verifyListView">
-            <div class="search-bar">
-              <input type="text" id="searchInput" placeholder="Search by DO, AWB, plate, forwarder…" oninput="renderList()">
-            </div>
-            <div class="filter-pills">
-              <div class="pill active" data-filter="all" onclick="setFilter(this)">All</div>
-              <div class="pill" data-filter="Pending" onclick="setFilter(this)">Pending</div>
-              <div class="pill" data-filter="Verified" onclick="setFilter(this)">Verified</div>
-              <div class="pill" data-filter="Amended" onclick="setFilter(this)">Amended</div>
-            </div>
-            <div id="entriesList"><div class="loading">Loading…</div></div>
-          </div>
-
-          <div id="verifyDetailView" style="display:none">
-            <button class="back-btn" onclick="backToList()">← Back to list</button>
-            <div class="card" style="padding:18px">
-              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-                <div>
-                  <div style="font-size:17px;font-weight:700" id="vEntryId">—</div>
-                  <div style="font-size:13px;color:var(--text-muted);margin-top:2px" id="vEntryTime">—</div>
-                </div>
-                <span class="status-badge" id="vBadge">—</span>
-              </div>
-              <div class="section-label">Entry Details</div>
-              <div style="overflow-x:auto;margin-bottom:14px">
-                <table class="verify-table"><thead><tr>
-                  <th class="field-name-col">Field</th>
-                  <th class="driver-val-col">Driver Input</th>
-                  <th>Correction</th>
-                </tr></thead><tbody id="verifyTableBody"></tbody></table>
-              </div>
-              <div class="section-label">Cargo Quantity</div>
-              <div style="overflow-x:auto;margin-bottom:14px">
-                <table class="verify-table"><thead><tr>
-                  <th>Type</th><th>Driver Input</th><th>Correction</th>
-                </tr></thead>
-                <tbody id="cargoTableBody"></tbody>
-                <tfoot><tr class="total-row">
-                  <td style="padding:9px 10px;font-size:14px">Total</td>
-                  <td style="padding:9px 10px" id="totalDriverQty">0</td>
-                  <td style="padding:9px 10px" id="totalCorrQty">0</td>
-                </tr></tfoot></table>
-              </div>
-              <div class="section-label">Remarks</div>
-              <textarea class="remarks-area" id="opRemarks" placeholder="Add any notes or remarks…"></textarea>
-              <div class="btn-row" style="margin-top:14px">
-                <button class="btn btn-outline" onclick="backToList()">Cancel</button>
-                <button class="btn btn-success" onclick="saveVerify()">✓ Save & Verify</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── PRINT TAB ── -->
-        <div class="op-sub-view" id="tab-print">
-          <div class="section-heading">Print Entries</div>
-          <div class="print-search-wrap">
-            <div class="field" style="margin-bottom:12px">
-              <label>Filter by Status</label>
-              <select id="printFilterStatus" onchange="renderPrintList()" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--input-bg);color:var(--text);width:100%;-webkit-appearance:none">
-                <option value="all">All Entries</option>
-                <option value="Pending">Pending only</option>
-                <option value="Verified">Verified only</option>
-                <option value="Amended">Amended only</option>
-              </select>
-            </div>
-            <div class="field" style="margin-bottom:0">
-              <label>Search by DO / AWB / Plate</label>
-              <input type="text" id="printSearch" placeholder="Type to filter…" oninput="renderPrintList()" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--input-bg);color:var(--text);width:100%">
-            </div>
-          </div>
-
-          <div class="print-search-wrap" style="padding:14px 18px">
-            <div class="select-all-row">
-              <input type="checkbox" id="selectAllChk" onchange="toggleSelectAll(this)">
-              <label for="selectAllChk" style="cursor:pointer">Select All</label>
-              <span id="selectedCount" style="margin-left:auto;font-size:12px;color:var(--blue);font-weight:700"></span>
-            </div>
-            <div id="printList"><div class="loading">Loading…</div></div>
-            <div class="print-actions">
-              <button class="btn btn-outline" onclick="clearPrintSelection()" style="font-size:13px;padding:10px">Clear</button>
-              <button class="btn btn-amber" onclick="printSelected()" style="font-size:13px;padding:10px">🖨 Print Selected</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── SUMMARY TAB ── -->
-        <div class="op-sub-view" id="tab-summary">
-          <div class="stat-tiles">
-            <div class="tile tile-total"><div class="tile-num" id="tTotal">0</div><div class="tile-label">Total</div></div>
-            <div class="tile tile-pending"><div class="tile-num" id="tPending">0</div><div class="tile-label">Pending</div></div>
-            <div class="tile tile-verified"><div class="tile-num" id="tVerified">0</div><div class="tile-label">Verified</div></div>
-            <div class="tile tile-amended"><div class="tile-num" id="tAmended">0</div><div class="tile-label">Amended</div></div>
-          </div>
-          <div class="filter-pills" style="margin-bottom:12px">
-            <div class="pill active" data-sfilter="all" onclick="setSumFilter(this)">All Dates</div>
-            <div class="pill" data-sfilter="today" onclick="setSumFilter(this)">Today</div>
-            <div class="pill" data-sfilter="week" onclick="setSumFilter(this)">This Week</div>
-          </div>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr>
-                <th>Entry ID</th><th>Forwarder</th><th>DO No.</th><th>AWB</th>
-                <th>Plate</th><th>Pallets</th><th>Cartons</th><th>Metro Cart</th>
-                <th>Crates</th><th>ADO/SKID</th><th>Total</th><th>Arrival</th>
-                <th>Status</th><th>Operator</th>
-              </tr></thead>
-              <tbody id="summaryTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ── CHARTS TAB ── -->
-        <div class="op-sub-view" id="tab-charts">
-          <div class="stat-tiles">
-            <div class="tile tile-total"><div class="tile-num" id="cTotal">0</div><div class="tile-label">Total</div></div>
-            <div class="tile tile-pending"><div class="tile-num" id="cPending">0</div><div class="tile-label">Pending</div></div>
-            <div class="tile tile-verified"><div class="tile-num" id="cToday">0</div><div class="tile-label">Today</div></div>
-            <div class="tile tile-amended"><div class="tile-num" id="cAmended">0</div><div class="tile-label">Amended</div></div>
-          </div>
-          <div class="chart-grid">
-            <div class="chart-card">
-              <div class="chart-title">Status Breakdown</div>
-              <div class="chart-container"><canvas id="chartDonut"></canvas></div>
-            </div>
-            <div class="chart-card">
-              <div class="chart-title">By Forwarder</div>
-              <div class="chart-container"><canvas id="chartBar"></canvas></div>
-            </div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title">7-Day Daily Arrivals</div>
-            <div class="chart-container-wide"><canvas id="chartLine"></canvas></div>
-          </div>
-        </div>
-
-      </div><!-- /console-body -->
-    </div><!-- /console-wrap -->
-  </div><!-- /opConsole -->
-
-</div><!-- /operatorMain -->
-
-<!-- PRINT ROOT (hidden until window.print()) -->
+<!-- PRINT ROOT -->
 <div id="printRoot"></div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── DEMO DATA ───
-let isDemoMode = false;
-const DEMO_ENTRIES = [
-  {id:'ARR-20260926-0001',timestamp:'2026-09-26T01:15:00.000Z',status:'Verified',forwarder:'Schenker',doNumber:'DO-SCH-2026-0891',awb:'AWB-12345678',truckPlate:'SGX1234A',cargo:{pallets:4,cartons:20,metroCart:0,crates:2,ado:0},corrections:{},operatorName:'Rahul',operatorRemarks:'All cargo intact.',verifiedAt:'2026-09-26T01:45:00.000Z'},
-  {id:'ARR-20260926-0002',timestamp:'2026-09-26T02:05:00.000Z',status:'Amended',forwarder:'Kuehne+Nagel',doNumber:'DO-KN-2026-4421',awb:'AWB-87654321',truckPlate:'GBP9876B',cargo:{pallets:6,cartons:0,metroCart:3,crates:0,ado:1},corrections:{cargo:{pallets:5,metroCart:4}},operatorName:'Siti',operatorRemarks:'Driver miscounted pallets — corrected to 5.',verifiedAt:'2026-09-26T02:30:00.000Z'},
-  {id:'ARR-20260926-0003',timestamp:'2026-09-26T03:40:00.000Z',status:'Pending',forwarder:'Expeditors',doNumber:'DO-EXP-2026-7732',awb:'AWB-11223344',truckPlate:'WXY5566C',cargo:{pallets:0,cartons:48,metroCart:0,crates:4,ado:0},corrections:{},operatorName:'',operatorRemarks:'',verifiedAt:''},
-  {id:'ARR-20260926-0004',timestamp:'2026-09-26T04:55:00.000Z',status:'Verified',forwarder:'DHL Global Forwarding',doNumber:'DO-DHL-2026-3309',awb:'AWB-55667788',truckPlate:'PDQ2233D',cargo:{pallets:8,cartons:12,metroCart:0,crates:0,ado:2},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-26T05:20:00.000Z'},
-  {id:'ARR-20260926-0005',timestamp:'2026-09-26T05:30:00.000Z',status:'Pending',forwarder:'Schenker',doNumber:'DO-SCH-2026-0892',awb:'',truckPlate:'TGA4411E',cargo:{pallets:2,cartons:0,metroCart:5,crates:0,ado:0},corrections:{},operatorName:'',operatorRemarks:'',verifiedAt:''},
-  {id:'ARR-20260926-0006',timestamp:'2026-09-26T06:10:00.000Z',status:'Amended',forwarder:'Nippon Express',doNumber:'DO-NX-2026-0055',awb:'AWB-99887766',truckPlate:'SBA3311F',cargo:{pallets:10,cartons:30,metroCart:0,crates:0,ado:0},corrections:{doNumber:'DO-NX-2026-0055-REV',cargo:{cartons:28}},operatorName:'Siti',operatorRemarks:'Carton count revised after physical check.',verifiedAt:'2026-09-26T06:40:00.000Z'},
-  {id:'ARR-20260926-0007',timestamp:'2026-09-26T07:00:00.000Z',status:'Verified',forwarder:'Expeditors',doNumber:'DO-EXP-2026-7800',awb:'AWB-22334455',truckPlate:'MCA6622G',cargo:{pallets:3,cartons:15,metroCart:0,crates:1,ado:0},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-26T07:25:00.000Z'},
-  {id:'ARR-20260925-0001',timestamp:'2026-09-25T01:20:00.000Z',status:'Verified',forwarder:'DHL Global Forwarding',doNumber:'DO-DHL-2026-3290',awb:'AWB-66778899',truckPlate:'PCX7744H',cargo:{pallets:5,cartons:40,metroCart:2,crates:0,ado:0},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-25T01:50:00.000Z'},
-  {id:'ARR-20260925-0002',timestamp:'2026-09-25T03:00:00.000Z',status:'Amended',forwarder:'Kuehne+Nagel',doNumber:'DO-KN-2026-4400',awb:'AWB-33445566',truckPlate:'SGY8801J',cargo:{pallets:7,cartons:0,metroCart:0,crates:5,ado:3},corrections:{cargo:{crates:4}},operatorName:'Siti',operatorRemarks:'One crate missing — driver to follow up.',verifiedAt:'2026-09-25T03:30:00.000Z'},
-  {id:'ARR-20260925-0003',timestamp:'2026-09-25T05:45:00.000Z',status:'Verified',forwarder:'Schenker',doNumber:'DO-SCH-2026-0880',awb:'AWB-44556677',truckPlate:'BQK1199K',cargo:{pallets:12,cartons:60,metroCart:0,crates:0,ado:0},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-25T06:10:00.000Z'},
-  {id:'ARR-20260924-0001',timestamp:'2026-09-24T02:00:00.000Z',status:'Verified',forwarder:'Nippon Express',doNumber:'DO-NX-2026-0048',awb:'AWB-77889900',truckPlate:'WBA2255L',cargo:{pallets:4,cartons:24,metroCart:1,crates:0,ado:0},corrections:{},operatorName:'Siti',operatorRemarks:'',verifiedAt:'2026-09-24T02:25:00.000Z'},
-  {id:'ARR-20260924-0002',timestamp:'2026-09-24T04:30:00.000Z',status:'Pending',forwarder:'Expeditors',doNumber:'DO-EXP-2026-7755',awb:'AWB-88990011',truckPlate:'GCA3344M',cargo:{pallets:0,cartons:80,metroCart:0,crates:0,ado:5},corrections:{},operatorName:'',operatorRemarks:'',verifiedAt:''},
-  {id:'ARR-20260923-0001',timestamp:'2026-09-23T01:10:00.000Z',status:'Verified',forwarder:'DHL Global Forwarding',doNumber:'DO-DHL-2026-3275',awb:'AWB-11002233',truckPlate:'PDX5577N',cargo:{pallets:6,cartons:18,metroCart:0,crates:2,ado:1},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-23T01:40:00.000Z'},
-  {id:'ARR-20260922-0001',timestamp:'2026-09-22T03:00:00.000Z',status:'Amended',forwarder:'Schenker',doNumber:'DO-SCH-2026-0870',awb:'AWB-22113344',truckPlate:'SBA9988P',cargo:{pallets:9,cartons:0,metroCart:6,crates:0,ado:0},corrections:{cargo:{metroCart:5}},operatorName:'Siti',operatorRemarks:'Metro cart recount done at dock.',verifiedAt:'2026-09-22T03:25:00.000Z'},
-  {id:'ARR-20260921-0001',timestamp:'2026-09-21T05:15:00.000Z',status:'Verified',forwarder:'Kuehne+Nagel',doNumber:'DO-KN-2026-4380',awb:'AWB-33224455',truckPlate:'MCA7711Q',cargo:{pallets:3,cartons:36,metroCart:0,crates:3,ado:0},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-21T05:45:00.000Z'},
-  {id:'ARR-20260920-0001',timestamp:'2026-09-20T02:30:00.000Z',status:'Verified',forwarder:'Nippon Express',doNumber:'DO-NX-2026-0040',awb:'AWB-44335566',truckPlate:'WCA8822R',cargo:{pallets:5,cartons:25,metroCart:2,crates:1,ado:0},corrections:{},operatorName:'Siti',operatorRemarks:'',verifiedAt:'2026-09-20T03:00.000Z'},
+// ─── DEMO DATA ───────────────────────────────────────────────────────────────
+var isDemoMode = false;
+var DEMO_ENTRIES = [
+  {id:'ARR-20260926-0001',timestamp:'2026-09-26T01:15:00.000Z',status:'Verified',driverName:'Ahmad Rosli',forwarder:'Schenker',doNumber:'DO-SCH-2026-0891',awb:'AWB-12345678',truckPlate:'SGX1234A',totalLines:6,cargo:{pallets:4,cartons:20,metroCart:0,crates:2,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'Rahul',operatorRemarks:'All cargo intact.',verifiedAt:'2026-09-26T01:45:00.000Z'},
+  {id:'ARR-20260926-0002',timestamp:'2026-09-26T02:05:00.000Z',status:'Verified',driverName:'Tan Boon Huat',forwarder:'Kuehne+Nagel',doNumber:'DO-KN-2026-4421',awb:'AWB-87654321',truckPlate:'GBP9876B',totalLines:10,cargo:{pallets:6,cartons:0,metroCart:3,crates:0,ado:1,other:0,otherDesc:''},corrections:{cargo:{pallets:5,metroCart:4}},operatorName:'Siti',operatorRemarks:'Driver miscounted pallets.',verifiedAt:'2026-09-26T02:30:00.000Z'},
+  {id:'ARR-20260926-0003',timestamp:'2026-09-26T03:40:00.000Z',status:'Pending',driverName:'Lee Ah Seng',forwarder:'Expeditors',doNumber:'DO-EXP-2026-7732',awb:'AWB-11223344',truckPlate:'WXY5566C',totalLines:52,cargo:{pallets:0,cartons:48,metroCart:0,crates:4,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'',operatorRemarks:'',verifiedAt:''},
+  {id:'ARR-20260926-0004',timestamp:'2026-09-26T04:55:00.000Z',status:'Verified',driverName:'Mohammed Hafiz',forwarder:'DHL Global Forwarding',doNumber:'DO-DHL-2026-3309',awb:'AWB-55667788',truckPlate:'PDQ2233D',totalLines:22,cargo:{pallets:8,cartons:12,metroCart:0,crates:0,ado:2,other:0,otherDesc:''},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-26T05:20:00.000Z'},
+  {id:'ARR-20260926-0005',timestamp:'2026-09-26T05:30:00.000Z',status:'Pending',driverName:'Ravi Kumar',forwarder:'Schenker',doNumber:'DO-SCH-2026-0892',awb:'AWB-33221100',truckPlate:'TGA4411E',totalLines:7,cargo:{pallets:2,cartons:0,metroCart:5,crates:0,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'',operatorRemarks:'',verifiedAt:''},
+  {id:'ARR-20260926-0006',timestamp:'2026-09-26T06:10:00.000Z',status:'Verified',driverName:'Suresh Pillai',forwarder:'Nippon Express',doNumber:'DO-NX-2026-0055',awb:'AWB-99887766',truckPlate:'SBA3311F',totalLines:40,cargo:{pallets:10,cartons:30,metroCart:0,crates:0,ado:0,other:0,otherDesc:''},corrections:{doNumber:'DO-NX-2026-0055-REV',cargo:{cartons:28}},operatorName:'Siti',operatorRemarks:'Carton count revised.',verifiedAt:'2026-09-26T06:40:00.000Z'},
+  {id:'ARR-20260926-0007',timestamp:'2026-09-26T07:00:00.000Z',status:'Verified',driverName:'Lim Teck Hwa',forwarder:'Expeditors',doNumber:'DO-EXP-2026-7800',awb:'AWB-22334455',truckPlate:'MCA6622G',totalLines:19,cargo:{pallets:3,cartons:15,metroCart:0,crates:1,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-26T07:25:00.000Z'},
+  {id:'ARR-20260925-0001',timestamp:'2026-09-25T01:20:00.000Z',status:'Verified',driverName:'Wong Kai Ming',forwarder:'DHL Global Forwarding',doNumber:'DO-DHL-2026-3290',awb:'AWB-66778899',truckPlate:'PCX7744H',totalLines:47,cargo:{pallets:5,cartons:40,metroCart:2,crates:0,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-25T01:50:00.000Z'},
+  {id:'ARR-20260925-0002',timestamp:'2026-09-25T03:00:00.000Z',status:'Verified',driverName:'Abdul Razak',forwarder:'Kuehne+Nagel',doNumber:'DO-KN-2026-4400',awb:'AWB-33445566',truckPlate:'SGY8801J',totalLines:15,cargo:{pallets:7,cartons:0,metroCart:0,crates:5,ado:3,other:0,otherDesc:''},corrections:{cargo:{crates:4}},operatorName:'Siti',operatorRemarks:'One crate missing.',verifiedAt:'2026-09-25T03:30:00.000Z'},
+  {id:'ARR-20260925-0003',timestamp:'2026-09-25T05:45:00.000Z',status:'Verified',driverName:'Chen Wei Long',forwarder:'Schenker',doNumber:'DO-SCH-2026-0880',awb:'AWB-44556677',truckPlate:'BQK1199K',totalLines:72,cargo:{pallets:12,cartons:60,metroCart:0,crates:0,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-25T06:10:00.000Z'},
+  {id:'ARR-20260924-0001',timestamp:'2026-09-24T02:00:00.000Z',status:'Verified',driverName:'Muthu Krishnan',forwarder:'Nippon Express',doNumber:'DO-NX-2026-0048',awb:'AWB-77889900',truckPlate:'WBA2255L',totalLines:29,cargo:{pallets:4,cartons:24,metroCart:1,crates:0,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'Siti',operatorRemarks:'',verifiedAt:'2026-09-24T02:25:00.000Z'},
+  {id:'ARR-20260924-0002',timestamp:'2026-09-24T04:30:00.000Z',status:'Pending',driverName:'Raj Balakrishnan',forwarder:'Expeditors',doNumber:'DO-EXP-2026-7755',awb:'AWB-88990011',truckPlate:'GCA3344M',totalLines:85,cargo:{pallets:0,cartons:80,metroCart:0,crates:0,ado:5,other:0,otherDesc:''},corrections:{},operatorName:'',operatorRemarks:'',verifiedAt:''},
+  {id:'ARR-20260923-0001',timestamp:'2026-09-23T01:10:00.000Z',status:'Verified',driverName:'Siew Fong Tian',forwarder:'DHL Global Forwarding',doNumber:'DO-DHL-2026-3275',awb:'AWB-11002233',truckPlate:'PDX5577N',totalLines:27,cargo:{pallets:6,cartons:18,metroCart:0,crates:2,ado:1,other:0,otherDesc:''},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-23T01:40:00.000Z'},
+  {id:'ARR-20260922-0001',timestamp:'2026-09-22T03:00:00.000Z',status:'Verified',driverName:'Hafizuddin Azri',forwarder:'Schenker',doNumber:'DO-SCH-2026-0870',awb:'AWB-22113344',truckPlate:'SBA9988P',totalLines:15,cargo:{pallets:9,cartons:0,metroCart:6,crates:0,ado:0,other:0,otherDesc:''},corrections:{cargo:{metroCart:5}},operatorName:'Siti',operatorRemarks:'Metro cart recount done.',verifiedAt:'2026-09-22T03:25:00.000Z'},
+  {id:'ARR-20260921-0001',timestamp:'2026-09-21T05:15:00.000Z',status:'Verified',driverName:'Tan Ah Kow',forwarder:'Kuehne+Nagel',doNumber:'DO-KN-2026-4380',awb:'AWB-33224455',truckPlate:'MCA7711Q',totalLines:42,cargo:{pallets:3,cartons:36,metroCart:0,crates:3,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'Rahul',operatorRemarks:'',verifiedAt:'2026-09-21T05:45:00.000Z'},
+  {id:'ARR-20260920-0001',timestamp:'2026-09-20T02:30:00.000Z',status:'Verified',driverName:'Gopal Sundaram',forwarder:'Nippon Express',doNumber:'DO-NX-2026-0040',awb:'AWB-44335566',truckPlate:'WCA8822R',totalLines:33,cargo:{pallets:5,cartons:25,metroCart:2,crates:1,ado:0,other:0,otherDesc:''},corrections:{},operatorName:'Siti',operatorRemarks:'',verifiedAt:'2026-09-20T03:00:00.000Z'}
 ];
 
-// ─── CONFIG ───
-const CONFIG = {
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+var CONFIG = {
   GITHUB_TOKEN: atob(['Z2l0aHViX3BhdF8xMUNJNFdD','Q1EwYTlaTjB0dElxb2d5X1JT','YThqeTN0eVk0VzlzWGt6RTlD','Wm43aFJnMjRjUGxXV1M5cTZn','eWRVOURZQUVQQ1hZTDdJVEhXMGtP'].join('')),
   GITHUB_OWNER: 'CLbizsupport',
   GITHUB_REPO:  'Warehouse-Entry-Form',
   GITHUB_FILE:  'data.json',
-  OPERATOR_PIN: '6767',
+  OPERATOR_PIN: '6767'
 };
-const API = `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/contents/${CONFIG.GITHUB_FILE}`;
-const HDR = { 'Authorization':`token ${CONFIG.GITHUB_TOKEN}`, 'Accept':'application/vnd.github.v3+json', 'Content-Type':'application/json' };
+var API = 'https://api.github.com/repos/'+CONFIG.GITHUB_OWNER+'/'+CONFIG.GITHUB_REPO+'/contents/'+CONFIG.GITHUB_FILE;
+var HDR = {'Authorization':'token '+CONFIG.GITHUB_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
 
+// ─── GITHUB ───────────────────────────────────────────────────────────────────
 async function ghRead() {
-  if(isDemoMode) return {entries:[...DEMO_ENTRIES],sha:null};
-  const r = await fetch(API,{headers:HDR});
-  if (r.status===404) return {entries:[],sha:null};
-  if (!r.ok) throw new Error(`GitHub read failed (${r.status})`);
-  const j = await r.json();
-  return {entries:JSON.parse(atob(j.content.replace(/\n/g,''))),sha:j.sha};
+  if (isDemoMode) return {entries: DEMO_ENTRIES.map(function(e){return Object.assign({},e);}), sha: null};
+  var r = await fetch(API, {headers: HDR});
+  if (r.status === 404) return {entries: [], sha: null};
+  if (!r.ok) throw new Error('GitHub read failed ('+r.status+')');
+  var j = await r.json();
+  return {entries: JSON.parse(atob(j.content.replace(/\n/g,''))), sha: j.sha};
 }
-async function ghWrite(entries,sha) {
-  if(isDemoMode){/* demo: update in-memory only */DEMO_ENTRIES.length=0;DEMO_ENTRIES.push(...entries);return;}
-  const body = {message:`gate: update ${new Date().toISOString()}`,content:btoa(unescape(encodeURIComponent(JSON.stringify(entries,null,2))))};
-  if (sha) body.sha=sha;
-  const r = await fetch(API,{method:'PUT',headers:HDR,body:JSON.stringify(body)});
-  if (!r.ok){const e=await r.json();throw new Error(e.message||`GitHub write failed (${r.status})`);}
+async function ghWrite(entries, sha) {
+  if (isDemoMode) { DEMO_ENTRIES.length=0; entries.forEach(function(e){DEMO_ENTRIES.push(e);}); return; }
+  var body = {message:'gate: update '+new Date().toISOString(), content: btoa(unescape(encodeURIComponent(JSON.stringify(entries,null,2))))};
+  if (sha) body.sha = sha;
+  var r = await fetch(API, {method:'PUT', headers:HDR, body:JSON.stringify(body)});
+  if (!r.ok) { var e = await r.json(); throw new Error(e.message || 'GitHub write failed ('+r.status+')'); }
 }
 
-// ─── UTILS ───
-function toast(msg,dur=3000){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
-function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleString('en-SG',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-function todayStr(){return new Date().toISOString().slice(0,10).replace(/-/g,'');}
-function genId(entries){const p=`ARR-${todayStr()}-`;return p+String(entries.filter(e=>e.id&&e.id.startsWith(p)).length+1).padStart(4,'0');}
-function cargoTotal(c){if(!c)return 0;return(c.pallets||0)+(c.cartons||0)+(c.metroCart||0)+(c.crates||0)+(c.ado||0);}
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function toast(msg, dur) {
+  dur = dur||3000;
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');}, dur);
+}
+function fmtDate(ts) {
+  if (!ts) return '--';
+  return new Date(ts).toLocaleString('en-SG',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function fmtDateLabel(ts) {
+  if (!ts) return '--';
+  return new Date(ts).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'}).replace(/ /g,'-');
+}
+function todayStr() { return new Date().toISOString().slice(0,10).replace(/-/g,''); }
+function genId(entries) {
+  var p = 'ARR-'+todayStr()+'-';
+  return p + String(entries.filter(function(e){return e.id && e.id.startsWith(p);}).length + 1).padStart(4,'0');
+}
+function cargoTotal(c) {
+  if (!c) return 0;
+  return (c.pallets||0)+(c.cartons||0)+(c.metroCart||0)+(c.crates||0)+(c.ado||0)+(c.other||0);
+}
+function getFinalCargo(entry) {
+  var c  = entry.cargo || {};
+  var cc = (entry.corrections && entry.corrections.cargo) || {};
+  return {
+    pallets:   cc.pallets   !== undefined ? cc.pallets   : (c.pallets  ||0),
+    cartons:   cc.cartons   !== undefined ? cc.cartons   : (c.cartons  ||0),
+    metroCart: cc.metroCart !== undefined ? cc.metroCart : (c.metroCart||0),
+    crates:    cc.crates    !== undefined ? cc.crates    : (c.crates   ||0),
+    ado:       cc.ado       !== undefined ? cc.ado       : (c.ado      ||0),
+    other:     cc.other     !== undefined ? cc.other     : (c.other    ||0)
+  };
+}
 
-// ─── DRIVER ───
-function showDriverPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+var currentPage = 'driver';
+var isOpAuth    = false;
+var pendingOpNav = null;
 
-async function submitDriver(){
-  const forwarder=document.getElementById('forwarder').value.trim();
-  const doNumber=document.getElementById('doNumber').value.trim();
-  const truckPlate=document.getElementById('truckPlate').value.trim().toUpperCase();
-  if(!forwarder||!doNumber||!truckPlate){toast('⚠️ Forwarder, DO Number and Truck Plate are required');return;}
-  const btn=event.target;btn.disabled=true;btn.textContent='Submitting…';
-  try{
-    const {entries,sha}=await ghRead();
-    const id=genId(entries);
-    const entry={id,timestamp:new Date().toISOString(),status:'Pending',forwarder,doNumber,awb:document.getElementById('awb').value.trim(),truckPlate,
-      cargo:{pallets:parseInt(document.getElementById('qPallets').value)||0,cartons:parseInt(document.getElementById('qCartons').value)||0,metroCart:parseInt(document.getElementById('qMetroCart').value)||0,crates:parseInt(document.getElementById('qCrates').value)||0,ado:parseInt(document.getElementById('qADO').value)||0},
-      corrections:{},operatorName:'',operatorRemarks:'',verifiedAt:''};
+function navTo(page) {
+  closeSidebar();
+  if (page === 'driver' && isOpAuth) {
+    isOpAuth = false;
+    currentOperator = '';
+    document.getElementById('sidebarFooter').style.display = 'none';
+  }
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  var pg = document.getElementById('page'+page.charAt(0).toUpperCase()+page.slice(1));
+  if (pg) pg.classList.add('active');
+  var ni = document.getElementById('ni-'+page);
+  if (ni) ni.classList.add('active');
+  currentPage = page;
+  if (page === 'summary') renderSummary();
+  if (page === 'charts')  renderCharts();
+  if (page === 'print')   renderPrintList();
+}
+
+function navOp(section) {
+  if (!isOpAuth) {
+    pendingOpNav = section;
+    openPinOverlay();
+    return;
+  }
+  navTo(section);
+  if (section === 'verify' && allEntries.length === 0) loadEntries();
+}
+
+// ─── SIDEBAR ─────────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ─── DRIVER FORM ─────────────────────────────────────────────────────────────
+function validateDriverForm() {
+  if (!document.getElementById('truckPlate').value.trim()) { toast('⚠️ Truck Plate is required'); return false; }
+  if (!document.getElementById('forwarder').value)         { toast('⚠️ Please select a Forwarder'); return false; }
+  if (!document.getElementById('doNumber').value.trim())   { toast('⚠️ Delivery Order (DO) is required'); return false; }
+  if (!document.getElementById('awb').value.trim())        { toast('⚠️ AWB is required'); return false; }
+  var total = (parseInt(document.getElementById('qADO').value)||0) +
+              (parseInt(document.getElementById('qPallets').value)||0) +
+              (parseInt(document.getElementById('qCartons').value)||0) +
+              (parseInt(document.getElementById('qMetroCart').value)||0) +
+              (parseInt(document.getElementById('qCrates').value)||0) +
+              (parseInt(document.getElementById('qOther').value)||0);
+  if (total === 0) { toast('⚠️ Enter at least one cargo quantity greater than 0'); return false; }
+  return true;
+}
+
+async function submitDriver() {
+  if (!validateDriverForm()) return;
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  try {
+    var d = await ghRead();
+    var entries = d.entries; var sha = d.sha;
+    var id = genId(entries);
+    var entry = {
+      id: id, timestamp: new Date().toISOString(), status: 'Pending',
+      forwarder:   document.getElementById('forwarder').value,
+      doNumber:    document.getElementById('doNumber').value.trim(),
+      awb:         document.getElementById('awb').value.trim(),
+      truckPlate:  document.getElementById('truckPlate').value.trim().toUpperCase(),
+      totalLines:  0,
+      cargo: {
+        pallets:   parseInt(document.getElementById('qPallets').value)   ||0,
+        cartons:   parseInt(document.getElementById('qCartons').value)   ||0,
+        metroCart: parseInt(document.getElementById('qMetroCart').value) ||0,
+        crates:    parseInt(document.getElementById('qCrates').value)    ||0,
+        ado:       parseInt(document.getElementById('qADO').value)       ||0,
+        other:     parseInt(document.getElementById('qOther').value)     ||0,
+        otherDesc: document.getElementById('qOtherDesc').value.trim()
+      },
+      corrections:{}, operatorName:'', operatorRemarks:'', verifiedAt:''
+    };
     entries.push(entry);
-    await ghWrite(entries,sha);
-    document.getElementById('successRef').textContent=id;
-    document.getElementById('successTime').textContent=fmtDate(entry.timestamp);
-    showDriverPage('dPageSuccess');
-  }catch(e){toast('❌ Submission failed: '+e.message);}
-  finally{btn.disabled=false;btn.textContent='Submit Check-In';}
-}
-
-function resetDriver(){
-  ['forwarder','doNumber','awb','truckPlate'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['qPallets','qCartons','qMetroCart','qCrates','qADO'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='0';});
-  showDriverPage('dPageForm');
-}
-
-// ─── OPERATOR / PIN ───
-let pinVal='';
-function openOp(){
-  document.getElementById('driverMain').style.display='none';
-  document.getElementById('operatorMain').style.display='block';
-  showOpPage('opPinPage');
-  pinVal='';updatePinDots();document.getElementById('pinError').textContent='';
-}
-function showOpPage(id){
-  ['opPinPage','opNamePage','opConsole'].forEach(p=>document.getElementById(p).style.display=p===id?'block':'none');
-}
-function pinPress(k){
-  if(k==='cancel'){exitConsole();return;}
-  if(k==='clear')pinVal=pinVal.slice(0,-1);
-  else if(pinVal.length<4)pinVal+=k;
-  updatePinDots();
-  if(pinVal.length===4)setTimeout(checkPin,150);
-}
-function updatePinDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('filled',i<pinVal.length);}
-function checkPin(){
-  if(pinVal===CONFIG.OPERATOR_PIN){
-    showOpPage('opNamePage');
-    document.getElementById('operatorName').value='';
-    setTimeout(()=>document.getElementById('operatorName').focus(),100);
-  }else{
-    document.getElementById('pinError').textContent='⚠️ Incorrect PIN. Try again.';
-    pinVal='';updatePinDots();
-    setTimeout(()=>{document.getElementById('pinError').textContent='';},2000);
+    await ghWrite(entries, sha);
+    document.getElementById('successRef').textContent  = 'DO Number: ' + entry.doNumber;
+    document.getElementById('successTime').textContent = fmtDate(entry.timestamp);
+    document.getElementById('driverFormView').style.display   = 'none';
+    document.getElementById('driverSuccessView').style.display = 'block';
+  } catch(e) {
+    toast('❌ Submission failed: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '✓ Submit Check-In';
   }
 }
-function confirmOpName(){
-  const name=document.getElementById('operatorName').value.trim();
-  if(!name){toast('Please enter your name');return;}
-  currentOperator=name;
-  document.getElementById('opSessionTag').textContent=`👤 ${name}  ·  ${new Date().toLocaleDateString('en-SG',{day:'2-digit',month:'short',year:'numeric'})}`;
-  showOpPage('opConsole');
-  switchTab('verify');
+
+function resetDriver() {
+  ['doNumber','awb','truckPlate','qOtherDesc'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value='';
+  });
+  ['qPallets','qCartons','qMetroCart','qCrates','qADO','qOther'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('forwarder').value = '';
+  document.getElementById('driverFormView').style.display    = 'block';
+  document.getElementById('driverSuccessView').style.display = 'none';
+}
+
+// ─── PIN / OPERATOR AUTH ──────────────────────────────────────────────────────
+var pinVal = '';
+
+function openPinOverlay() {
+  pinVal = '';
+  updatePinDots();
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('pinStep').style.display  = 'block';
+  document.getElementById('nameStep').style.display = 'none';
+  document.getElementById('pinOverlay').classList.add('open');
+}
+function closePinOverlay() {
+  document.getElementById('pinOverlay').classList.remove('open');
+  pendingOpNav = null;
+}
+function pinPress(k) {
+  if (k === 'clear') pinVal = pinVal.slice(0,-1);
+  else if (pinVal.length < 4) pinVal += k;
+  updatePinDots();
+  if (pinVal.length === 4) setTimeout(checkPin, 150);
+}
+function updatePinDots() {
+  for (var i=0; i<4; i++) document.getElementById('d'+i).classList.toggle('filled', i<pinVal.length);
+}
+function checkPin() {
+  if (pinVal === CONFIG.OPERATOR_PIN) {
+    document.getElementById('pinStep').style.display  = 'none';
+    document.getElementById('nameStep').style.display = 'block';
+    document.getElementById('operatorName').value = '';
+    setTimeout(function(){document.getElementById('operatorName').focus();}, 100);
+  } else {
+    document.getElementById('pinError').textContent = '⚠️ Incorrect PIN. Try again.';
+    pinVal = ''; updatePinDots();
+    setTimeout(function(){document.getElementById('pinError').textContent='';}, 2000);
+  }
+}
+function confirmOpName() {
+  var name = document.getElementById('operatorName').value.trim();
+  if (!name) { toast('Please enter your name'); return; }
+  currentOperator = name;
+  isOpAuth = true;
+  document.getElementById('sidebarFooter').style.display = 'block';
+  document.getElementById('opSideTag').textContent  = '👤 ' + name;
+  document.getElementById('opSideDate').textContent = new Date().toLocaleDateString('en-SG',{day:'2-digit',month:'short',year:'numeric'}) + (isDemoMode ? '  ·  🧪 DEMO' : '');
+  document.getElementById('pinOverlay').classList.remove('open');
+  var dest = pendingOpNav || 'verify';
+  pendingOpNav = null;
   loadEntries();
-}
-function exitConsole(){
-  document.getElementById('operatorMain').style.display='none';
-  document.getElementById('driverMain').style.display='block';
-  currentOperator='';allEntries=[];activeFilter='all';activeSumFilter='all';
+  navTo(dest);
 }
 
-// ─── STATE ───
-let currentOperator='',allEntries=[],currentSha=null,activeFilter='all',activeSumFilter='all';
-let charts={};
+var currentOperator = '', allEntries = [], currentSha = null;
+var activeFilter = 'all', activeSumFilter = 'all';
+var charts = {};
 
-async function loadEntries(){
-  try{const{entries,sha}=await ghRead();allEntries=[...entries].reverse();currentSha=sha;renderList();renderPrintList();}
-  catch(e){toast('❌ '+e.message);}
+async function loadEntries() {
+  try {
+    var d = await ghRead();
+    allEntries = d.entries.slice().reverse();
+    currentSha = d.sha;
+    renderList(); renderPrintList();
+  } catch(e) { toast('❌ ' + e.message); }
 }
 
-// ─── TAB SWITCHING ───
-function switchTab(name){
-  document.querySelectorAll('.op-sub-view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  document.querySelectorAll('.console-tab').forEach((t,i)=>{t.classList.toggle('active',['verify','print','summary','charts'][i]===name);});
-  if(name==='summary')renderSummary();
-  if(name==='charts')renderCharts();
-  if(name==='print')renderPrintList();
+function exitConsole() {
+  isOpAuth = false;
+  currentOperator = '';
+  allEntries = [];
+  activeFilter = 'all';
+  activeSumFilter = 'all';
+  document.getElementById('sidebarFooter').style.display = 'none';
+  navTo('driver');
+  if (!isDemoMode) isDemoMode = false;
 }
 
-// ─── VERIFY LIST ───
-function setFilter(el){document.querySelectorAll('[data-filter]').forEach(p=>p.classList.remove('active'));el.classList.add('active');activeFilter=el.dataset.filter;renderList();}
-
-function renderList(){
-  const q=(document.getElementById('searchInput').value||'').toLowerCase();
-  let list=activeFilter==='all'?allEntries:allEntries.filter(e=>e.status===activeFilter);
-  if(q)list=list.filter(e=>(e.doNumber||'').toLowerCase().includes(q)||(e.awb||'').toLowerCase().includes(q)||(e.truckPlate||'').toLowerCase().includes(q)||(e.forwarder||'').toLowerCase().includes(q)||(e.id||'').toLowerCase().includes(q));
-  const el=document.getElementById('entriesList');
-  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div style="font-weight:600">No entries found</div></div>`;return;}
-  el.innerHTML=list.map(e=>`
-    <div class="entry-card" onclick="openVerify('${e.id}')">
-      <div class="entry-card-top">
-        <span class="entry-id">${e.id}</span>
-        <span class="status-badge badge-${(e.status||'Pending').toLowerCase()}">${e.status||'Pending'}</span>
-      </div>
-      <div class="entry-card-meta">
-        <div class="meta-item">DO: <span>${e.doNumber||'—'}</span></div>
-        <div class="meta-item">AWB: <span>${e.awb||'—'}</span></div>
-        <div class="meta-item">Plate: <span>${e.truckPlate||'—'}</span></div>
-        <div class="meta-item">Forwarder: <span>${e.forwarder||'—'}</span></div>
-      </div>
-    </div>`).join('');
+// ─── VERIFY LIST ─────────────────────────────────────────────────────────────
+function setFilter(el) {
+  document.querySelectorAll('[data-filter]').forEach(function(p){p.classList.remove('active');});
+  el.classList.add('active');
+  activeFilter = el.dataset.filter;
+  renderList();
 }
 
-// ─── VERIFY DETAIL ───
-let verifyEntry=null,verifyCorr={};
-const INFO_FIELDS=[{key:'forwarder',label:'Forwarder'},{key:'doNumber',label:'DO Number'},{key:'awb',label:'AWB'},{key:'truckPlate',label:'Truck Plate'}];
-const CARGO_KEYS=[{key:'pallets',label:'Pallets'},{key:'cartons',label:'Cartons'},{key:'metroCart',label:'Metro Cart'},{key:'crates',label:'Crates'},{key:'ado',label:'ADO/SKID'}];
-
-function openVerify(id){
-  verifyEntry=allEntries.find(e=>e.id===id);if(!verifyEntry)return;
-  verifyCorr={...(verifyEntry.corrections||{})};
-  document.getElementById('vEntryId').textContent=verifyEntry.id;
-  document.getElementById('vEntryTime').textContent='Arrived: '+fmtDate(verifyEntry.timestamp);
-  const s=verifyEntry.status||'Pending';
-  const b=document.getElementById('vBadge');b.textContent=s;b.className='status-badge badge-'+s.toLowerCase();
-  document.getElementById('verifyTableBody').innerHTML=INFO_FIELDS.map(f=>{
-    const orig=verifyEntry[f.key]||'';
-    const corr=verifyCorr[f.key]!==undefined?verifyCorr[f.key]:orig;
-    const ch=verifyCorr[f.key]!==undefined&&verifyCorr[f.key]!==orig;
-    return`<tr><td class="field-name-col">${f.label}</td><td class="driver-val-col">${orig||'—'}</td><td><input class="edit-input${ch?' changed':''}" id="vi_${f.key}" value="${corr.replace(/"/g,'&quot;')}" oninput="onEdit('info','${f.key}',this)"></td></tr>`;
+function renderList() {
+  var q = (document.getElementById('searchInput').value || '').toLowerCase();
+  var list = activeFilter === 'all' ? allEntries : allEntries.filter(function(e){return e.status === activeFilter;});
+  if (q) list = list.filter(function(e){
+    return (e.doNumber||'').toLowerCase().includes(q) ||
+           (e.awb||'').toLowerCase().includes(q) ||
+           (e.truckPlate||'').toLowerCase().includes(q) ||
+           (e.forwarder||'').toLowerCase().includes(q) ||
+           (e.id||'').toLowerCase().includes(q) ||
+           (e.driverName||'').toLowerCase().includes(q);
+  });
+  var el = document.getElementById('entriesList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📫</div><div style="font-weight:600">No entries found</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(function(e){
+    return '<div class="entry-card" onclick="openVerify(\''+e.id+'\')">' +
+      '<div class="entry-card-top">' +
+      '<span class="entry-id">'+e.id+'</span>' +
+      '<span class="status-badge badge-'+(e.status||'Pending').toLowerCase()+'">'+(e.status||'Pending')+'</span>' +
+      '</div>' +
+      '<div class="entry-card-meta">' +
+      '<div class="meta-item">Driver: <span>'+(e.driverName||'--')+'</span></div>' +
+      '<div class="meta-item">DO: <span>'+(e.doNumber||'--')+'</span></div>' +
+      '<div class="meta-item">Plate: <span>'+(e.truckPlate||'--')+'</span></div>' +
+      '<div class="meta-item">Forwarder: <span>'+(e.forwarder||'--')+'</span></div>' +
+      '</div></div>';
   }).join('');
-  const cargo=verifyEntry.cargo||{};const cc=verifyCorr.cargo||{};
-  document.getElementById('cargoTableBody').innerHTML=CARGO_KEYS.map(c=>{
-    const orig=cargo[c.key]||0;const corr=cc[c.key]!==undefined?cc[c.key]:orig;const ch=cc[c.key]!==undefined&&cc[c.key]!==orig;
-    return`<tr><td class="field-name-col">${c.label}</td><td class="driver-val-col">${orig}</td><td><input class="edit-input${ch?' changed':''}" id="vc_${c.key}" type="number" value="${corr}" min="0" oninput="onEdit('cargo','${c.key}',this)"></td></tr>`;
+}
+
+// ─── VERIFY DETAIL ────────────────────────────────────────────────────────────
+var verifyEntry = null, verifyCorr = {};
+
+var INFO_FIELDS = [
+  {key:'driverName', label:'Driver Name'},
+  {key:'forwarder',  label:'Forwarder'},
+  {key:'doNumber',   label:'DO Number'},
+  {key:'awb',        label:'AWB'},
+  {key:'truckPlate', label:'Truck Plate'}
+];
+var CARGO_KEYS = [
+  {key:'pallets',   label:'Pallets (PLT)'},
+  {key:'cartons',   label:'Cartons (CRT)'},
+  {key:'metroCart', label:'Metro Car (MC)'},
+  {key:'crates',    label:'Crates'},
+  {key:'ado',       label:'ADO/SKID'},
+  {key:'other',     label:'Other'}
+];
+
+function openVerify(id) {
+  verifyEntry = null;
+  for (var i=0; i<allEntries.length; i++) { if (allEntries[i].id === id) { verifyEntry = allEntries[i]; break; } }
+  if (!verifyEntry) return;
+  verifyCorr = Object.assign({}, verifyEntry.corrections || {});
+
+  document.getElementById('vEntryId').textContent   = verifyEntry.id;
+  document.getElementById('vEntryTime').textContent = 'Submitted: ' + fmtDate(verifyEntry.timestamp);
+  var s = verifyEntry.status || 'Pending';
+  var b = document.getElementById('vBadge');
+  b.textContent = s; b.className = 'status-badge badge-' + s.toLowerCase();
+
+  document.getElementById('verifyTableBody').innerHTML = INFO_FIELDS.map(function(f){
+    var orig = verifyEntry[f.key] !== undefined ? String(verifyEntry[f.key]) : '';
+    var corr = verifyCorr[f.key]  !== undefined ? verifyCorr[f.key] : orig;
+    var ch   = verifyCorr[f.key]  !== undefined && String(verifyCorr[f.key]) !== orig;
+    return '<tr><td class="field-name-col">'+f.label+'</td><td class="driver-val-col">'+(orig||'--')+'</td>' +
+      '<td><input class="edit-input'+(ch?' changed':'')+'" id="vi_'+f.key+'" value="'+String(corr).replace(/"/g,'&quot;')+'" oninput="onEdit(\'info\',\''+f.key+'\',this)"></td></tr>';
   }).join('');
-  document.getElementById('opRemarks').value=verifyEntry.operatorRemarks||'';
+
+  var cargo = verifyEntry.cargo || {};
+  var cc    = verifyCorr.cargo  || {};
+  document.getElementById('cargoTableBody').innerHTML = CARGO_KEYS.map(function(c){
+    var orig = cargo[c.key] || 0;
+    var corr = cc[c.key] !== undefined ? cc[c.key] : orig;
+    var ch   = cc[c.key] !== undefined && cc[c.key] !== orig;
+    return '<tr><td class="field-name-col">'+c.label+'</td><td class="driver-val-col">'+orig+'</td>' +
+      '<td><input class="edit-input'+(ch?' changed':'')+'" id="vc_'+c.key+'" type="text" inputmode="numeric" value="'+corr+'" oninput="onEdit(\'cargo\',\''+c.key+'\',this)"></td></tr>';
+  }).join('');
+
+  document.getElementById('opTotalLines').value = verifyEntry.totalLines || '';
+  document.getElementById('opRemarks').value    = verifyEntry.operatorRemarks || '';
   updateTotals();
-  document.getElementById('verifyListView').style.display='none';
-  document.getElementById('verifyDetailView').style.display='block';
-}
-function backToList(){document.getElementById('verifyDetailView').style.display='none';document.getElementById('verifyListView').style.display='block';}
-function onEdit(type,key,input){
-  if(type==='info'){const orig=verifyEntry[key]||'';if(input.value!==orig){verifyCorr[key]=input.value;input.classList.add('changed');}else{delete verifyCorr[key];input.classList.remove('changed');}}
-  else{if(!verifyCorr.cargo)verifyCorr.cargo={};const orig=(verifyEntry.cargo||{})[key]||0;const val=parseInt(input.value)||0;if(val!==orig){verifyCorr.cargo[key]=val;input.classList.add('changed');}else{delete verifyCorr.cargo[key];input.classList.remove('changed');}updateTotals();}
-}
-function updateTotals(){
-  let dT=0,cT=0;
-  CARGO_KEYS.forEach(c=>{const d=(verifyEntry.cargo||{})[c.key]||0;const cv=document.getElementById('vc_'+c.key);const cv2=cv?parseInt(cv.value)||0:d;dT+=d;cT+=cv2;});
-  document.getElementById('totalDriverQty').textContent=dT;
-  document.getElementById('totalCorrQty').textContent=cT;
-}
-async function saveVerify(){
-  const btn=event.target;btn.disabled=true;btn.textContent='Saving…';
-  try{
-    const{entries,sha}=await ghRead();
-    const idx=entries.findIndex(e=>e.id===verifyEntry.id);
-    if(idx===-1)throw new Error('Entry not found');
-    const infoCorr={};INFO_FIELDS.forEach(f=>{if(verifyCorr[f.key]!==undefined)infoCorr[f.key]=verifyCorr[f.key];});
-    const finalCargo={...(entries[idx].cargo||{})};if(verifyCorr.cargo)Object.assign(finalCargo,verifyCorr.cargo);
-    const hasCorrns=Object.keys(infoCorr).length>0||Object.keys(verifyCorr.cargo||{}).length>0;
-    entries[idx]={...entries[idx],...infoCorr,cargo:finalCargo,corrections:verifyCorr,status:hasCorrns?'Amended':'Verified',operatorName:currentOperator,operatorRemarks:document.getElementById('opRemarks').value.trim(),verifiedAt:new Date().toISOString()};
-    await ghWrite(entries,sha);
-    allEntries=[...entries].reverse();
-    toast(hasCorrns?'✅ Entry amended & saved':'✅ Entry verified');
-    backToList();renderList();
-  }catch(e){toast('❌ Save failed: '+e.message);}
-  finally{btn.disabled=false;btn.textContent='✓ Save & Verify';}
+  document.getElementById('verifyListView').style.display   = 'none';
+  document.getElementById('verifyDetailView').style.display = 'block';
 }
 
-// ─── PRINT TAB ───
-let printSelected_ids = new Set();
+function backToList() {
+  document.getElementById('verifyDetailView').style.display = 'none';
+  document.getElementById('verifyListView').style.display   = 'block';
+}
 
-function renderPrintList(){
-  const q=(document.getElementById('printSearch').value||'').toLowerCase();
-  const sf=document.getElementById('printFilterStatus').value;
-  let list=sf==='all'?allEntries:allEntries.filter(e=>e.status===sf);
-  if(q)list=list.filter(e=>(e.doNumber||'').toLowerCase().includes(q)||(e.awb||'').toLowerCase().includes(q)||(e.truckPlate||'').toLowerCase().includes(q)||(e.id||'').toLowerCase().includes(q));
-  const el=document.getElementById('printList');
-  if(!list.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><div style="font-weight:600">No entries found</div></div>`;updateSelectedCount();return;}
-  el.innerHTML=list.map(e=>`
-    <div class="print-entry-row">
-      <input type="checkbox" id="pc_${e.id}" ${printSelected_ids.has(e.id)?'checked':''} onchange="togglePrintEntry('${e.id}',this)">
-      <div class="print-entry-info">
-        <div class="print-entry-id">${e.id}</div>
-        <div class="print-entry-meta">DO: ${e.doNumber||'—'}  ·  AWB: ${e.awb||'—'}  ·  Plate: ${e.truckPlate||'—'}  ·  Total: ${cargoTotal(e.cargo)} pcs</div>
-      </div>
-      <div class="print-entry-badge">
-        <span class="status-badge badge-${(e.status||'Pending').toLowerCase()}">${e.status||'Pending'}</span>
-      </div>
-    </div>`).join('');
+function onEdit(type, key, input) {
+  if (type === 'info') {
+    var orig = verifyEntry[key] !== undefined ? String(verifyEntry[key]) : '';
+    if (input.value !== orig) { verifyCorr[key] = input.value; input.classList.add('changed'); }
+    else { delete verifyCorr[key]; input.classList.remove('changed'); }
+  } else {
+    if (!verifyCorr.cargo) verifyCorr.cargo = {};
+    var orig2 = (verifyEntry.cargo || {})[key] || 0;
+    var val   = parseInt(input.value) || 0;
+    if (val !== orig2) { verifyCorr.cargo[key] = val; input.classList.add('changed'); }
+    else { delete verifyCorr.cargo[key]; input.classList.remove('changed'); }
+    updateTotals();
+  }
+}
+
+function updateTotals() {
+  var dT=0, cT=0;
+  CARGO_KEYS.forEach(function(c){
+    var d   = (verifyEntry.cargo||{})[c.key]||0;
+    var cv  = document.getElementById('vc_'+c.key);
+    var cv2 = cv ? (parseInt(cv.value)||0) : d;
+    dT += d; cT += cv2;
+  });
+  document.getElementById('totalDriverQty').textContent = dT;
+  document.getElementById('totalCorrQty').textContent   = cT;
+}
+
+async function saveVerify() {
+  var tl = parseInt(document.getElementById('opTotalLines').value) || 0;
+  if (!tl) { toast('⚠️ Total Lines is required'); return; }
+  var btn = event.target; btn.disabled=true; btn.textContent='Saving...';
+  try {
+    var d = await ghRead();
+    var entries = d.entries; var sha = d.sha;
+    var idx = -1;
+    for (var i=0; i<entries.length; i++) { if (entries[i].id === verifyEntry.id) { idx=i; break; } }
+    if (idx === -1) throw new Error('Entry not found');
+
+    var infoCorr = {};
+    INFO_FIELDS.forEach(function(f){ if (verifyCorr[f.key] !== undefined) infoCorr[f.key] = verifyCorr[f.key]; });
+
+    var finalCargo = Object.assign({}, entries[idx].cargo || {});
+    if (verifyCorr.cargo) Object.assign(finalCargo, verifyCorr.cargo);
+
+    entries[idx] = Object.assign({}, entries[idx], infoCorr, {
+      cargo:           finalCargo,
+      corrections:     verifyCorr,
+      status:          'Verified',
+      totalLines:      tl,
+      operatorName:    currentOperator,
+      operatorRemarks: document.getElementById('opRemarks').value.trim(),
+      verifiedAt:      new Date().toISOString()
+    });
+    await ghWrite(entries, sha);
+    allEntries = entries.slice().reverse();
+    toast('✅ Entry verified & saved');
+    backToList(); renderList();
+  } catch(e) {
+    toast('❌ Save failed: ' + e.message);
+  } finally {
+    btn.disabled=false; btn.textContent='✓ Save & Verify';
+  }
+}
+
+// ─── PRINT ────────────────────────────────────────────────────────────────────
+var printIds = new Set();
+var UOM_MAP = [
+  {key:'pallets',   short:'PLT'},
+  {key:'cartons',   short:'CRT'},
+  {key:'crates',    short:'Crate'},
+  {key:'metroCart', short:'MC'},
+  {key:'ado',       short:'ADO/SKID'},
+  {key:'other',     short:'Other'}
+];
+
+function labelCount(cargo) {
+  return UOM_MAP.reduce(function(s,u){return s+(cargo[u.key]||0);}, 0);
+}
+
+function renderPrintList() {
+  var q  = (document.getElementById('printSearch').value || '').toLowerCase();
+  var list = allEntries.filter(function(e){return e.status==='Verified';});
+  if (q) list = list.filter(function(e){
+    return (e.doNumber||'').toLowerCase().includes(q)||(e.awb||'').toLowerCase().includes(q)||
+           (e.truckPlate||'').toLowerCase().includes(q)||(e.id||'').toLowerCase().includes(q)||
+           (e.driverName||'').toLowerCase().includes(q);
+  });
+  var el = document.getElementById('printList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📫</div><div style="font-weight:600">No entries</div></div>';
+    updateSelectedCount(); return;
+  }
+  el.innerHTML = list.map(function(e){
+    var fc  = getFinalCargo(e);
+    var lc  = labelCount(fc);
+    return '<div class="print-entry-row">' +
+      '<input type="checkbox" id="pc_'+e.id+'" '+(printIds.has(e.id)?'checked':'')+' onchange="togglePrintEntry(\''+e.id+'\',this)">' +
+      '<div class="print-entry-info">' +
+      '<div class="print-entry-id">'+e.id+'</div>' +
+      '<div class="print-entry-meta">DO: '+(e.doNumber||'--')+'  ·  '+(e.driverName||'--')+'  ·  '+lc+' labels</div>' +
+      '</div>' +
+      '<span class="status-badge badge-'+(e.status||'Pending').toLowerCase()+'" style="flex-shrink:0">'+(e.status||'Pending')+'</span>' +
+      '</div>';
+  }).join('');
   updateSelectedCount();
 }
 
-function togglePrintEntry(id,chk){if(chk.checked)printSelected_ids.add(id);else printSelected_ids.delete(id);updateSelectedCount();}
-function toggleSelectAll(chk){
-  const list=getFilteredPrintList();
-  list.forEach(e=>{if(chk.checked)printSelected_ids.add(e.id);else printSelected_ids.delete(e.id);});
+function togglePrintEntry(id, chk) { if (chk.checked) printIds.add(id); else printIds.delete(id); updateSelectedCount(); }
+function toggleSelectAll(chk) {
+  var q  = (document.getElementById('printSearch').value || '').toLowerCase();
+  var list = allEntries.filter(function(e){return e.status==='Verified';});
+  if (q) list = list.filter(function(e){return (e.doNumber||'').toLowerCase().includes(q)||(e.id||'').toLowerCase().includes(q)||(e.driverName||'').toLowerCase().includes(q);});
+  list.forEach(function(e){if (chk.checked) printIds.add(e.id); else printIds.delete(e.id);});
   renderPrintList();
 }
-function clearPrintSelection(){printSelected_ids.clear();renderPrintList();}
-function updateSelectedCount(){const n=printSelected_ids.size;document.getElementById('selectedCount').textContent=n>0?`${n} selected`:'none selected';}
-function getFilteredPrintList(){
-  const q=(document.getElementById('printSearch').value||'').toLowerCase();
-  const sf=document.getElementById('printFilterStatus').value;
-  let list=sf==='all'?allEntries:allEntries.filter(e=>e.status===sf);
-  if(q)list=list.filter(e=>(e.doNumber||'').toLowerCase().includes(q)||(e.awb||'').toLowerCase().includes(q)||(e.truckPlate||'').toLowerCase().includes(q)||(e.id||'').toLowerCase().includes(q));
-  return list;
+function clearPrintSelection() { printIds.clear(); renderPrintList(); }
+function updateSelectedCount() {
+  document.getElementById('selectedCount').textContent = printIds.size>0 ? printIds.size+' selected' : 'none selected';
 }
 
-function printSelected(){
-  if(printSelected_ids.size===0){toast('⚠️ Select at least one entry to print');return;}
-  const toPrint=allEntries.filter(e=>printSelected_ids.has(e.id));
-  const total=toPrint.length;
-  const printTime=fmtDate(new Date().toISOString());
-
-  const pages=toPrint.map((e,idx)=>{
-    const cargo=e.cargo||{};
-    const cc=e.corrections&&e.corrections.cargo?e.corrections.cargo:{};
-    const fP=cc.pallets!==undefined?cc.pallets:cargo.pallets||0;
-    const fC=cc.cartons!==undefined?cc.cartons:cargo.cartons||0;
-    const fMC=cc.metroCart!==undefined?cc.metroCart:cargo.metroCart||0;
-    const fCr=cc.crates!==undefined?cc.crates:cargo.crates||0;
-    const fA=cc.ado!==undefined?cc.ado:cargo.ado||0;
-    const dT=cargoTotal(cargo);
-    const cT=fP+fC+fMC+fCr+fA;
-    const infoCorr=e.corrections||{};
-    const finalForwarder=infoCorr.forwarder||e.forwarder||'—';
-    const finalDO=infoCorr.doNumber||e.doNumber||'—';
-    const finalAWB=infoCorr.awb||e.awb||'—';
-    const finalPlate=infoCorr.truckPlate||e.truckPlate||'—';
-    const isLast=idx===total-1;
-
-    return`<div class="pr-page${isLast?'':' print-page-break'}">
-      <div class="pr-header">
-        <div>
-          <div class="pr-logo">DSV</div>
-          <div class="pr-title">Warehouse Gate Check-In Record</div>
-          <div class="pr-meta">Arrived: ${fmtDate(e.timestamp)}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="pr-page-num">Entry ${idx+1} of ${total}</div>
-          <div style="font-size:9pt;color:#555;margin-top:4px">Printed: ${printTime}</div>
-          <div class="pr-stamp-box" style="margin-top:8px;margin-left:auto">RECEIVED</div>
-        </div>
-      </div>
-
-      <div class="pr-section-title">Shipment Information</div>
-      <div class="pr-grid">
-        <div class="pr-field"><div class="pr-field-label">Entry ID</div><div class="pr-field-value">${e.id}</div></div>
-        <div class="pr-field"><div class="pr-field-label">Status</div><div class="pr-field-value">${e.status||'Pending'}</div></div>
-        <div class="pr-field"><div class="pr-field-label">Forwarder</div><div class="pr-field-value">${finalForwarder}</div></div>
-        <div class="pr-field"><div class="pr-field-label">DO Number</div><div class="pr-field-value">${finalDO}</div></div>
-        <div class="pr-field"><div class="pr-field-label">AWB</div><div class="pr-field-value">${finalAWB}</div></div>
-        <div class="pr-field"><div class="pr-field-label">Truck Plate</div><div class="pr-field-value">${finalPlate}</div></div>
-      </div>
-
-      <div class="pr-section-title">Cargo Quantity</div>
-      <table class="pr-cargo-table">
-        <thead><tr><th>Type</th><th>Pallets</th><th>Cartons</th><th>Metro Cart</th><th>Crates</th><th>ADO/SKID</th><th>Total</th></tr></thead>
-        <tbody>
-          <tr><td>Driver Input</td><td>${cargo.pallets||0}</td><td>${cargo.cartons||0}</td><td>${cargo.metroCart||0}</td><td>${cargo.crates||0}</td><td>${cargo.ado||0}</td><td>${dT}</td></tr>
-          <tr class="pr-total-row"><td>Final (Verified)</td><td>${fP}</td><td>${fC}</td><td>${fMC}</td><td>${fCr}</td><td>${fA}</td><td>${cT}</td></tr>
-        </tbody>
-      </table>
-
-      <div class="pr-section-title">Operator Information</div>
-      <div class="pr-grid">
-        <div class="pr-field"><div class="pr-field-label">Verified By</div><div class="pr-field-value">${e.operatorName||'—'}</div></div>
-        <div class="pr-field"><div class="pr-field-label">Verified At</div><div class="pr-field-value">${fmtDate(e.verifiedAt)}</div></div>
-        <div class="pr-field" style="grid-column:1/-1"><div class="pr-field-label">Remarks</div><div class="pr-field-value" style="min-height:28px">${e.operatorRemarks||'—'}</div></div>
-      </div>
-
-      <div class="pr-sig-row">
-        <div class="pr-sig-box">Driver Signature</div>
-        <div class="pr-sig-box">Operator Signature</div>
-        <div class="pr-sig-box">Warehouse Stamp</div>
-      </div>
-      <div class="pr-footer">DSV Warehouse Gate System · ${e.id} · Printed ${printTime}</div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('printRoot').innerHTML=pages;
+function doPrint() {
+  if (printIds.size === 0) { toast('⚠️ Select at least one entry'); return; }
+  var toPrint = allEntries.filter(function(e){return printIds.has(e.id) && e.status==='Verified';});
+  if (!toPrint.length) { toast('⚠️ Only verified entries can be printed'); return; }
+  var allLabels = [];
+  toPrint.forEach(function(entry){
+    var fc = getFinalCargo(entry);
+    var ic = entry.corrections || {};
+    var finalDO        = ic.doNumber  || entry.doNumber  || '--';
+    var finalForwarder = ic.forwarder || entry.forwarder || '--';
+    var dateLabel      = fmtDateLabel(entry.timestamp);
+    var hour           = new Date(entry.timestamp).getHours();
+    UOM_MAP.forEach(function(u){
+      var qty = fc[u.key] || 0;
+      for (var i=1; i<=qty; i++) {
+        allLabels.push({finalDO:finalDO, finalForwarder:finalForwarder, dateLabel:dateLabel, hour:hour, counter:i, total:qty, uom:u.short});
+      }
+    });
+  });
+  if (allLabels.length === 0) { toast('⚠️ No units to print for selected entries'); return; }
+  document.getElementById('printRoot').innerHTML =
+    '<div class="pr-labels-grid">' +
+    allLabels.map(function(x){
+      return '<div class="pr-label">' +
+        '<div class="pr-label-logo">DSV</div>' +
+        '<table class="pr-label-table">' +
+        '<tr><td class="pr-lk">DO:</td><td class="pr-lv">'+x.finalDO+'</td></tr>' +
+        '<tr><td class="pr-lk">Forwarder:</td><td class="pr-lv">'+x.finalForwarder+'</td></tr>' +
+        '<tr><td class="pr-lk">Date:</td><td class="pr-lv">'+x.dateLabel+'</td></tr>' +
+        '<tr><td class="pr-lk">Total Handover:</td><td class="pr-lv pr-big">'+x.counter+'/'+x.total+' '+x.uom+'</td></tr>' +
+        '<tr><td class="pr-lk last">Shipment Time:</td><td class="pr-lv pr-time">'+x.hour+'</td></tr>' +
+        '</table></div>';
+    }).join('') +
+    '</div>';
   window.print();
 }
 
-// ─── SUMMARY ───
-function setSumFilter(el){document.querySelectorAll('[data-sfilter]').forEach(p=>p.classList.remove('active'));el.classList.add('active');activeSumFilter=el.dataset.sfilter;renderSummary();}
-function renderSummary(){
-  const t=allEntries.length,p=allEntries.filter(e=>e.status==='Pending').length,v=allEntries.filter(e=>e.status==='Verified').length,a=allEntries.filter(e=>e.status==='Amended').length;
-  document.getElementById('tTotal').textContent=t;document.getElementById('tPending').textContent=p;document.getElementById('tVerified').textContent=v;document.getElementById('tAmended').textContent=a;
-  const today=new Date();today.setHours(0,0,0,0);const wa=new Date(today);wa.setDate(wa.getDate()-7);
-  let list=allEntries;
-  if(activeSumFilter==='today')list=list.filter(e=>new Date(e.timestamp)>=today);
-  else if(activeSumFilter==='week')list=list.filter(e=>new Date(e.timestamp)>=wa);
-  const tb=document.getElementById('summaryTableBody');
-  if(!list.length){tb.innerHTML=`<tr><td colspan="14" style="text-align:center;padding:24px;color:var(--text-muted)">No entries</td></tr>`;return;}
-  tb.innerHTML=list.map(e=>{
-    const c=e.cargo||{};const tot=cargoTotal(c);
-    return`<tr>
-      <td class="id-cell">${e.id||'—'}</td>
-      <td>${e.forwarder||'—'}</td><td>${e.doNumber||'—'}</td><td>${e.awb||'—'}</td><td>${e.truckPlate||'—'}</td>
-      <td style="text-align:center">${c.pallets||0}</td><td style="text-align:center">${c.cartons||0}</td>
-      <td style="text-align:center">${c.metroCart||0}</td><td style="text-align:center">${c.crates||0}</td><td style="text-align:center">${c.ado||0}</td>
-      <td style="text-align:center;font-weight:700">${tot}</td>
-      <td style="white-space:nowrap">${fmtDate(e.timestamp)}</td>
-      <td><span class="status-badge badge-${(e.status||'Pending').toLowerCase()}">${e.status||'Pending'}</span></td>
-      <td>${e.operatorName||'—'}</td>
-    </tr>`;
+// ─── SUMMARY ──────────────────────────────────────────────────────────────────
+function setSumFilter(el) {
+  document.querySelectorAll('[data-sfilter]').forEach(function(p){p.classList.remove('active');});
+  el.classList.add('active');
+  activeSumFilter = el.dataset.sfilter;
+  renderSummary();
+}
+
+function getSumFilters() {
+  return {
+    date:     (document.getElementById('sfDate')     ? document.getElementById('sfDate').value.toLowerCase()     : ''),
+    status:   (document.getElementById('sfStatus')   ? document.getElementById('sfStatus').value                 : ''),
+    forwarder:(document.getElementById('sfForwarder')? document.getElementById('sfForwarder').value.toLowerCase(): ''),
+    doNum:    (document.getElementById('sfDO')       ? document.getElementById('sfDO').value.toLowerCase()       : ''),
+    awb:      (document.getElementById('sfAWB')      ? document.getElementById('sfAWB').value.toLowerCase()      : ''),
+    plate:    (document.getElementById('sfPlate')    ? document.getElementById('sfPlate').value.toLowerCase()    : ''),
+    entryId:  (document.getElementById('sfEntryId') ? document.getElementById('sfEntryId').value.toLowerCase()  : '')
+  };
+}
+
+function renderSummary() {
+  var today = new Date(); today.setHours(0,0,0,0);
+  var t  = allEntries.length;
+  var p  = allEntries.filter(function(e){return e.status==='Pending';}).length;
+  var v  = allEntries.filter(function(e){return e.status==='Verified';}).length;
+  var td = allEntries.filter(function(e){return new Date(e.timestamp)>=today;}).length;
+  document.getElementById('tTotal').textContent   = t;
+  document.getElementById('tPending').textContent = p;
+  document.getElementById('tVerified').textContent= v;
+  document.getElementById('tToday').textContent   = td;
+
+  var wa = new Date(today); wa.setDate(wa.getDate()-7);
+  var list = allEntries;
+  if (activeSumFilter === 'today') list = list.filter(function(e){return new Date(e.timestamp)>=today;});
+  else if (activeSumFilter === 'week') list = list.filter(function(e){return new Date(e.timestamp)>=wa;});
+
+  // Apply column filters
+  var f = getSumFilters();
+  if (f.date)      list = list.filter(function(e){ return fmtDate(e.timestamp).toLowerCase().includes(f.date) || fmtDate(e.verifiedAt).toLowerCase().includes(f.date); });
+  if (f.status)    list = list.filter(function(e){ return (e.status||'Pending') === f.status; });
+  if (f.forwarder) list = list.filter(function(e){ return (e.forwarder||'').toLowerCase().includes(f.forwarder); });
+  if (f.doNum)     list = list.filter(function(e){ return (e.doNumber||'').toLowerCase().includes(f.doNum); });
+  if (f.awb)       list = list.filter(function(e){ return (e.awb||'').toLowerCase().includes(f.awb); });
+  if (f.plate)     list = list.filter(function(e){ return (e.truckPlate||'').toLowerCase().includes(f.plate); });
+  if (f.entryId)   list = list.filter(function(e){ return (e.id||'').toLowerCase().includes(f.entryId); });
+
+  // Store filtered list for export
+  window._sumFilteredList = list;
+
+  var tb = document.getElementById('summaryTableBody');
+  if (!list.length) {
+    tb.innerHTML = '<tr><td colspan="17" style="text-align:center;padding:28px;color:var(--text-muted)">No entries</td></tr>';
+    return;
+  }
+  tb.innerHTML = list.map(function(e){
+    var fc  = getFinalCargo(e);
+    var tot = cargoTotal(fc);
+    return '<tr>' +
+      '<td style="white-space:nowrap;font-size:12px">'+fmtDate(e.timestamp)+'</td>' +
+      '<td style="white-space:nowrap;font-size:12px">'+fmtDate(e.verifiedAt)+'</td>' +
+      '<td><span class="status-badge badge-'+(e.status||'Pending').toLowerCase()+'">'+(e.status||'Pending')+'</span></td>' +
+      '<td>'+(e.forwarder||'--')+'</td>' +
+      '<td>'+(e.doNumber||'--')+'</td>' +
+      '<td>'+(e.awb||'--')+'</td>' +
+      '<td>'+(e.truckPlate||'--')+'</td>' +
+      '<td style="text-align:center">'+(fc.pallets||0)+'</td>' +
+      '<td style="text-align:center">'+(fc.cartons||0)+'</td>' +
+      '<td style="text-align:center">'+(fc.metroCart||0)+'</td>' +
+      '<td style="text-align:center">'+(fc.crates||0)+'</td>' +
+      '<td style="text-align:center">'+(fc.ado||0)+'</td>' +
+      '<td style="text-align:center">'+(fc.other||0)+'</td>' +
+      '<td style="text-align:center;font-weight:700">'+tot+'</td>' +
+      '<td style="text-align:center">'+(e.totalLines||0)+'</td>' +
+      '<td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(e.operatorRemarks||'')+'</td>' +
+      '<td class="id-cell">'+(e.id||'--')+'</td>' +
+      '</tr>';
   }).join('');
 }
 
-// ─── CHARTS ───
-function renderCharts(){
-  const total=allEntries.length;
-  const pending=allEntries.filter(e=>e.status==='Pending').length;
-  const verified=allEntries.filter(e=>e.status==='Verified').length;
-  const amended=allEntries.filter(e=>e.status==='Amended').length;
-  const today=new Date();today.setHours(0,0,0,0);
-  const todayCount=allEntries.filter(e=>new Date(e.timestamp)>=today).length;
-  document.getElementById('cTotal').textContent=total;
-  document.getElementById('cPending').textContent=pending;
-  document.getElementById('cToday').textContent=todayCount;
-  document.getElementById('cAmended').textContent=amended;
+function exportSummaryCSV() {
+  var list = window._sumFilteredList || allEntries;
+  if (!list.length) { toast('No data to export'); return; }
+  var headers = ['Driver Submit Time','Operator Verified Time','Status','Forwarder','DO No.','AWB','Plate','PLT','CRT','MC','Crate','ADO/SKID','Other','Total Units','Total Lines','Remarks','Entry ID'];
+  var rows = list.map(function(e){
+    var fc = getFinalCargo(e);
+    var esc = function(v){ v = String(v||''); return (v.includes(',') || v.includes('"') || v.includes('\n')) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+    return [
+      esc(fmtDate(e.timestamp)), esc(fmtDate(e.verifiedAt)),
+      esc(e.status||'Pending'), esc(e.forwarder||''), esc(e.doNumber||''), esc(e.awb||''), esc(e.truckPlate||''),
+      fc.pallets||0, fc.cartons||0, fc.metroCart||0, fc.crates||0, fc.ado||0, fc.other||0,
+      cargoTotal(fc), e.totalLines||0, esc(e.operatorRemarks||''), esc(e.id||'')
+    ].join(',');
+  });
+  var csv = headers.join(',') + '\n' + rows.join('\n');
+  var msg = document.getElementById('sumExportMsg');
+  try {
+    navigator.clipboard.writeText(csv).then(function(){
+      msg.textContent = '✅ CSV copied to clipboard — paste into Excel';
+      setTimeout(function(){msg.textContent='';}, 5000);
+    }).catch(function(){ fallbackCopyCSV(csv, msg); });
+  } catch(err) { fallbackCopyCSV(csv, msg); }
+}
 
-  if(charts.donut)charts.donut.destroy();
-  charts.donut=new Chart(document.getElementById('chartDonut').getContext('2d'),{
+function fallbackCopyCSV(csv, msg) {
+  var ta = document.createElement('textarea');
+  ta.value = csv;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try {
+    document.execCommand('copy');
+    msg.textContent = '✅ CSV copied to clipboard — paste into Excel';
+  } catch(e) {
+    msg.textContent = '⚠️ Copy failed — try selecting the table manually';
+  }
+  document.body.removeChild(ta);
+  setTimeout(function(){msg.textContent='';}, 5000);
+}
+
+// ─── CHARTS ───────────────────────────────────────────────────────────────────
+function renderCharts() {
+  var today   = new Date(); today.setHours(0,0,0,0);
+  var pending = allEntries.filter(function(e){return e.status==='Pending';}).length;
+  var verified= allEntries.filter(function(e){return e.status==='Verified';}).length;
+  var todayC  = allEntries.filter(function(e){return new Date(e.timestamp)>=today;}).length;
+  document.getElementById('cTotal').textContent   = allEntries.length;
+  document.getElementById('cPending').textContent = pending;
+  document.getElementById('cVerified').textContent= verified;
+  document.getElementById('cToday').textContent   = todayC;
+
+  if (charts.donut) charts.donut.destroy();
+  charts.donut = new Chart(document.getElementById('chartDonut').getContext('2d'), {
     type:'doughnut',
-    data:{labels:['Pending','Verified','Amended'],datasets:[{data:[pending,verified,amended],backgroundColor:['#f59e0b','#10b981','#3b82f6'],borderWidth:0,hoverOffset:6}]},
+    data:{labels:['Pending','Verified'],datasets:[{data:[pending,verified],backgroundColor:['#f59e0b','#10b981'],borderWidth:0,hoverOffset:6}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}}}
   });
 
-  const fwdMap={};allEntries.forEach(e=>{const k=e.forwarder||'Unknown';fwdMap[k]=(fwdMap[k]||0)+1;});
-  const sorted=Object.entries(fwdMap).sort((a,b)=>b[1]-a[1]).slice(0,7);
-  if(charts.bar)charts.bar.destroy();
-  charts.bar=new Chart(document.getElementById('chartBar').getContext('2d'),{
+  var fwdMap = {};
+  allEntries.forEach(function(e){var k=e.forwarder||'Unknown'; fwdMap[k]=(fwdMap[k]||0)+1;});
+  var sorted = Object.entries(fwdMap).sort(function(a,b){return b[1]-a[1];}).slice(0,7);
+  if (charts.bar) charts.bar.destroy();
+  charts.bar = new Chart(document.getElementById('chartBar').getContext('2d'), {
     type:'bar',
-    data:{labels:sorted.map(x=>x[0]),datasets:[{data:sorted.map(x=>x[1]),backgroundColor:'#1a3a6b',borderRadius:5,barThickness:24}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{ticks:{font:{size:11}}}}}
+    data:{labels:sorted.map(function(x){return x[0];}),datasets:[{data:sorted.map(function(x){return x[1];}),backgroundColor:'#1a3a6b',borderRadius:5,barThickness:22}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{ticks:{font:{size:10}}}}}
   });
 
-  const days=[],counts=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);
-    const dn=new Date(d);dn.setDate(dn.getDate()+1);
+  var days=[],counts=[];
+  for (var i=6; i>=0; i--) {
+    var d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-i);
+    var dn=new Date(d); dn.setDate(dn.getDate()+1);
     days.push(d.toLocaleDateString('en-SG',{day:'2-digit',month:'short'}));
-    counts.push(allEntries.filter(e=>{const t=new Date(e.timestamp);return t>=d&&t<dn;}).length);
+    counts.push(allEntries.filter(function(e){var t=new Date(e.timestamp);return t>=d&&t<dn;}).length);
   }
-  if(charts.line)charts.line.destroy();
-  charts.line=new Chart(document.getElementById('chartLine').getContext('2d'),{
+  if (charts.line) charts.line.destroy();
+  charts.line = new Chart(document.getElementById('chartLine').getContext('2d'), {
     type:'line',
     data:{labels:days,datasets:[{label:'Arrivals',data:counts,borderColor:'#1a3a6b',backgroundColor:'rgba(26,58,107,0.08)',tension:.4,fill:true,pointBackgroundColor:'#1a3a6b',pointRadius:5}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
   });
 }
 
-function loadDemoMode(){
-  isDemoMode=true;
-  currentSha=null;
-  allEntries=[...DEMO_ENTRIES];
-  currentOperator='Demo Operator';
-  document.getElementById('opSessionTag').textContent=`👤 Demo Operator  ·  ${new Date().toLocaleDateString('en-SG',{day:'2-digit',month:'short',year:'numeric'})}  ·  🧪 DEMO`;
-  showOpPage('opConsole');
-  switchTab('verify');
-  renderList();
-  toast('🧪 Demo mode — data is local only, nothing saved to GitHub');
+// ─── DEMO MODE ────────────────────────────────────────────────────────────────
+function loadDemoMode() {
+  isDemoMode = true;
+  if (isOpAuth) {
+    allEntries = DEMO_ENTRIES.slice().reverse();
+    renderList(); renderPrintList();
+    toast('🧪 Demo data reloaded');
+    return;
+  }
+  pendingOpNav = 'verify';
+  // Use a demo operator shortcut
+  currentOperator = 'Demo Operator';
+  isOpAuth = true;
+  allEntries = DEMO_ENTRIES.slice().reverse();
+  document.getElementById('sidebarFooter').style.display = 'block';
+  document.getElementById('opSideTag').textContent  = '👤 Demo Operator';
+  document.getElementById('opSideDate').textContent = new Date().toLocaleDateString('en-SG',{day:'2-digit',month:'short',year:'numeric'}) + '  ·  🧪 DEMO';
+  navTo('verify');
+  toast('🧪 Demo mode — nothing is saved to GitHub');
 }
 
-// ─── KEYBOARD ───
-document.addEventListener('keydown',e=>{
-  const pp=document.getElementById('opPinPage');
-  if(pp&&pp.style.display!=='none'){
-    if(/^[0-9]$/.test(e.key))pinPress(e.key);
-    else if(e.key==='Backspace')pinPress('clear');
-    else if(e.key==='Escape')pinPress('cancel');
+// ─── KEYBOARD ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  var po = document.getElementById('pinOverlay');
+  if (po && po.classList.contains('open')) {
+    var ps = document.getElementById('pinStep');
+    if (ps && ps.style.display !== 'none') {
+      if (/^[0-9]$/.test(e.key)) pinPress(e.key);
+      else if (e.key === 'Backspace') pinPress('clear');
+      else if (e.key === 'Escape')    closePinOverlay();
+    }
   }
 });
-document.getElementById('operatorName').addEventListener('keydown',e=>{if(e.key==='Enter')confirmOpName();});
+document.getElementById('operatorName').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') confirmOpName();
+});
 </script>
 </body>
 </html>
